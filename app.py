@@ -47,44 +47,65 @@ st.markdown("""
 .hero h1{margin:0;font-size:2rem;line-height:1.15}.hero p{margin:.45rem 0 0;color:#9aa0a6;font-size:.95rem}
 .status-ok{padding:.65rem .8rem;border-radius:14px;background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.28)}
 .status-warn{padding:.65rem .8rem;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28)}
-.lotto-row{display:flex;gap:.72rem;flex-wrap:wrap;align-items:center;margin:.72rem 0 1.15rem;padding:.18rem .06rem .55rem;perspective:900px}
+.lotto-row{display:flex;gap:.72rem;flex-wrap:wrap;align-items:center;margin:.78rem 0 1.25rem;padding:.3rem .08rem .7rem;perspective:1000px}
 .ball{
   --c1:#f6c515;--c2:#d99b00;--c3:#8b5c00;
-  position:relative;width:56px;height:56px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:1.12rem;letter-spacing:-.02em;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.72),0 0 4px rgba(0,0,0,.28);
+  position:relative;width:62px;height:62px;flex:0 0 62px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
   background:
-    radial-gradient(circle at 33% 24%,rgba(255,255,255,.98) 0 5%,rgba(255,255,255,.54) 6%,rgba(255,255,255,0) 22%),
-    radial-gradient(circle at 38% 34%,var(--c1) 0 25%,var(--c2) 57%,var(--c3) 100%);
-  border:1px solid rgba(255,255,255,.52);
+    radial-gradient(circle at 30% 20%,rgba(255,255,255,.98) 0 4%,rgba(255,255,255,.63) 5%,rgba(255,255,255,0) 20%),
+    radial-gradient(circle at 38% 32%,var(--c1) 0 22%,var(--c2) 57%,var(--c3) 100%);
+  border:1px solid rgba(255,255,255,.58);
   box-shadow:
-    inset 7px 9px 13px rgba(255,255,255,.28),
-    inset -10px -13px 16px rgba(0,0,0,.36),
-    inset 0 0 0 3px rgba(255,255,255,.08),
-    0 2px 0 rgba(255,255,255,.16),
-    0 9px 14px rgba(0,0,0,.34),
-    0 15px 22px rgba(0,0,0,.16);
+    inset 8px 10px 15px rgba(255,255,255,.32),
+    inset -11px -14px 18px rgba(0,0,0,.39),
+    inset 0 0 0 3px rgba(255,255,255,.10),
+    0 2px 0 rgba(255,255,255,.20),
+    0 9px 14px rgba(0,0,0,.38),
+    0 16px 25px rgba(0,0,0,.18);
   transform:translateZ(0);isolation:isolate;
 }
-.ball::before{content:"";position:absolute;left:11%;top:9%;width:38%;height:22%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.10));filter:blur(.15px);transform:rotate(-28deg);opacity:.88;z-index:-1}
-.ball::after{content:"";position:absolute;left:12%;right:12%;bottom:-8px;height:10px;border-radius:50%;background:rgba(0,0,0,.34);filter:blur(5px);z-index:-2}
-.b1{--c1:#ffd94a;--c2:#f2b400;--c3:#9e6400}
-.b2{--c1:#62b7ff;--c2:#247ff0;--c3:#0b3f98}
-.b3{--c1:#ff7b78;--c2:#ef3f49;--c3:#921d2b}
-.b4{--c1:#c5cbd3;--c2:#7f8792;--c3:#3f4650}
-.b5{--c1:#69d876;--c2:#36a84b;--c3:#176127}
-.bonus{width:58px;height:58px;box-shadow:inset 7px 9px 13px rgba(255,255,255,.30),inset -10px -13px 16px rgba(0,0,0,.38),inset 0 0 0 3px rgba(255,255,255,.11),0 0 0 3px rgba(255,255,255,.20),0 0 0 6px rgba(255,206,84,.36),0 10px 18px rgba(0,0,0,.40),0 0 20px rgba(255,206,84,.18)}
-.bonus-label{display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#b6bac2;font-size:1.35rem;margin:0 .02rem;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.ball::before{content:"";position:absolute;left:10%;top:8%;width:42%;height:24%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.12));filter:blur(.15px);transform:rotate(-28deg);opacity:.92;z-index:1;pointer-events:none}
+.ball::after{content:"";position:absolute;left:12%;right:12%;bottom:-9px;height:11px;border-radius:50%;background:rgba(0,0,0,.38);filter:blur(5px);z-index:-2;pointer-events:none}
+.ball-num{
+  position:relative;z-index:3;width:68%;height:68%;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:1000;font-size:1.68rem;line-height:1;letter-spacing:-.055em;color:#fff;
+  -webkit-text-stroke:1.15px rgba(15,18,24,.88);
+  text-shadow:0 2px 1px rgba(0,0,0,.78),0 0 4px rgba(0,0,0,.58),0 1px 8px rgba(0,0,0,.32);
+  background:radial-gradient(circle at 38% 30%,rgba(255,255,255,.22),rgba(255,255,255,.08) 42%,rgba(0,0,0,.15) 100%);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.28),inset 0 -2px 4px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.08);
+}
+.b1{--c1:#ffe56a;--c2:#f4b900;--c3:#8e5700}
+.b2{--c1:#76c5ff;--c2:#2588f7;--c3:#073c98}
+.b3{--c1:#ff8986;--c2:#ef414b;--c3:#8d1929}
+.b4{--c1:#d6dbe1;--c2:#89919c;--c3:#3d444e}
+.b5{--c1:#7be285;--c2:#39ad4e;--c3:#145d24}
+.bonus{width:66px;height:66px;flex-basis:66px;box-shadow:inset 8px 10px 15px rgba(255,255,255,.33),inset -12px -15px 19px rgba(0,0,0,.42),inset 0 0 0 3px rgba(255,255,255,.12),0 0 0 3px rgba(255,255,255,.20),0 0 0 6px rgba(255,205,78,.42),0 11px 20px rgba(0,0,0,.44),0 0 24px rgba(255,205,78,.22)}
+.bonus .ball-num{font-size:1.78rem}
+.bonus-label{display:inline-flex;align-items:center;justify-content:center;font-weight:1000;color:#c2c6ce;font-size:1.55rem;margin:0 .04rem;text-shadow:0 2px 3px rgba(0,0,0,.65)}
 .game-card{padding:.8rem;border:1px solid rgba(128,128,128,.18);border-radius:16px;margin:.5rem 0;background:rgba(127,127,127,.035)}
 .game-title{font-weight:800;margin-bottom:.35rem}.small-note{font-size:.83rem;color:#8f949b}.section-title{font-size:1.16rem;font-weight:800;margin:.55rem 0 .4rem}
 .stButton>button{border-radius:12px;font-weight:700}
-@media(max-width:768px){.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}.ball{width:47px;height:47px;font-size:1rem}.bonus{width:49px;height:49px}.lotto-row{gap:.48rem}[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}}
+@media(max-width:768px){
+.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}
+.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}
+.lotto-row{gap:.42rem;margin:.72rem 0 1.12rem;padding:.3rem 0 .72rem}
+.ball{width:50px;height:50px;flex-basis:50px}
+.ball-num{width:70%;height:70%;font-size:1.42rem;-webkit-text-stroke:1px rgba(15,18,24,.9);text-shadow:0 2px 1px rgba(0,0,0,.78),0 0 4px rgba(0,0,0,.55)}
+.bonus{width:54px;height:54px;flex-basis:54px}
+.bonus .ball-num{font-size:1.52rem}
+.bonus-label{font-size:1.38rem}
+.game-card .lotto-row{gap:.34rem}.game-card .ball{width:47px;height:47px;flex-basis:47px}.game-card .ball-num{font-size:1.30rem}
+[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}
+}
+@media(max-width:390px){.ball{width:48px;height:48px;flex-basis:48px}.ball-num{font-size:1.36rem}.lotto-row{gap:.32rem}.bonus{width:52px;height:52px;flex-basis:52px}.bonus .ball-num{font-size:1.46rem}}
 </style>
 """,unsafe_allow_html=True)
 
 def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
 def balls_html(nums,bonus=None):
-    parts=[f'<span class="ball {ball_class(int(n))}">{int(n)}</span>' for n in nums]
-    if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus">{int(bonus)}</span>']
+    parts=[f'<span class="ball {ball_class(int(n))}"><span class="ball-num">{int(n)}</span></span>' for n in nums]
+    if bonus is not None:
+        parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
@@ -191,4 +212,4 @@ with tabs[8]:
     probs=theoretical_single_game(); labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등'}; st.dataframe(pd.DataFrame([{'등위':labels[k],'확률':pct(v,6),'약 1 / N':f"1 / {round(1/v):,}"} for k,v in probs.items()]),use_container_width=True,hide_index=True)
 with tabs[9]:
     st.markdown('''**권장 사용 순서**\n1. 상단의 데이터 정상 표시 확인\n2. 번호 분석과 Pair/Triple로 과거 상태 확인\n3. 백테스트·고급 검증·AI 진단으로 랜덤 기준선과 비교\n4. 마지막에 추천 조합 생성 및 시뮬레이션\n\n**중요**\n- 모든 특정 6개 조합의 1등 확률은 같습니다.\n- Hot/Cold, Gap, Pair, Triple은 과거 통계일 뿐 미래를 보장하지 않습니다.\n- MD Score는 당첨확률이 아닙니다.''')
-    st.caption('MD LOTTO 6/45 · Final Mobile UI')
+    st.caption('MD LOTTO 6/45 · Visual Final UI')

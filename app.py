@@ -47,20 +47,44 @@ st.markdown("""
 .hero h1{margin:0;font-size:2rem;line-height:1.15}.hero p{margin:.45rem 0 0;color:#9aa0a6;font-size:.95rem}
 .status-ok{padding:.65rem .8rem;border-radius:14px;background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.28)}
 .status-warn{padding:.65rem .8rem;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28)}
-.lotto-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem}
-.ball{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem;color:white;box-shadow:inset 0 -4px 0 rgba(0,0,0,.12),0 2px 7px rgba(0,0,0,.18)}
-.b1{background:#f2b705}.b2{background:#3d8bfd}.b3{background:#ef5350}.b4{background:#8a8f98}.b5{background:#43a047}.bonus{outline:3px solid rgba(255,255,255,.28);outline-offset:2px}
+.lotto-row{display:flex;gap:.72rem;flex-wrap:wrap;align-items:center;margin:.72rem 0 1.15rem;padding:.18rem .06rem .55rem;perspective:900px}
+.ball{
+  --c1:#f6c515;--c2:#d99b00;--c3:#8b5c00;
+  position:relative;width:56px;height:56px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1.12rem;letter-spacing:-.02em;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.72),0 0 4px rgba(0,0,0,.28);
+  background:
+    radial-gradient(circle at 33% 24%,rgba(255,255,255,.98) 0 5%,rgba(255,255,255,.54) 6%,rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 38% 34%,var(--c1) 0 25%,var(--c2) 57%,var(--c3) 100%);
+  border:1px solid rgba(255,255,255,.52);
+  box-shadow:
+    inset 7px 9px 13px rgba(255,255,255,.28),
+    inset -10px -13px 16px rgba(0,0,0,.36),
+    inset 0 0 0 3px rgba(255,255,255,.08),
+    0 2px 0 rgba(255,255,255,.16),
+    0 9px 14px rgba(0,0,0,.34),
+    0 15px 22px rgba(0,0,0,.16);
+  transform:translateZ(0);isolation:isolate;
+}
+.ball::before{content:"";position:absolute;left:11%;top:9%;width:38%;height:22%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.10));filter:blur(.15px);transform:rotate(-28deg);opacity:.88;z-index:-1}
+.ball::after{content:"";position:absolute;left:12%;right:12%;bottom:-8px;height:10px;border-radius:50%;background:rgba(0,0,0,.34);filter:blur(5px);z-index:-2}
+.b1{--c1:#ffd94a;--c2:#f2b400;--c3:#9e6400}
+.b2{--c1:#62b7ff;--c2:#247ff0;--c3:#0b3f98}
+.b3{--c1:#ff7b78;--c2:#ef3f49;--c3:#921d2b}
+.b4{--c1:#c5cbd3;--c2:#7f8792;--c3:#3f4650}
+.b5{--c1:#69d876;--c2:#36a84b;--c3:#176127}
+.bonus{width:58px;height:58px;box-shadow:inset 7px 9px 13px rgba(255,255,255,.30),inset -10px -13px 16px rgba(0,0,0,.38),inset 0 0 0 3px rgba(255,255,255,.11),0 0 0 3px rgba(255,255,255,.20),0 0 0 6px rgba(255,206,84,.36),0 10px 18px rgba(0,0,0,.40),0 0 20px rgba(255,206,84,.18)}
+.bonus-label{display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#b6bac2;font-size:1.35rem;margin:0 .02rem;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .game-card{padding:.8rem;border:1px solid rgba(128,128,128,.18);border-radius:16px;margin:.5rem 0;background:rgba(127,127,127,.035)}
 .game-title{font-weight:800;margin-bottom:.35rem}.small-note{font-size:.83rem;color:#8f949b}.section-title{font-size:1.16rem;font-weight:800;margin:.55rem 0 .4rem}
 .stButton>button{border-radius:12px;font-weight:700}
-@media(max-width:768px){.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}.ball{width:42px;height:42px;font-size:.98rem}.lotto-row{gap:.38rem}[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}}
+@media(max-width:768px){.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}.ball{width:47px;height:47px;font-size:1rem}.bonus{width:49px;height:49px}.lotto-row{gap:.48rem}[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}}
 </style>
 """,unsafe_allow_html=True)
 
 def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
 def balls_html(nums,bonus=None):
     parts=[f'<span class="ball {ball_class(int(n))}">{int(n)}</span>' for n in nums]
-    if bonus is not None: parts += ['<span style="font-weight:800;color:#8f949b">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus">{int(bonus)}</span>']
+    if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus">{int(bonus)}</span>']
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'

@@ -18,9 +18,7 @@ import os as _os
 _os.environ.setdefault("MD_LOTTO_DATA_DIR", str(_RUNTIME / "data"))
 
 from pathlib import Path
-import os
-import threading
-import time
+import os, threading, time
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -31,131 +29,142 @@ from md_lotto.backtest import walk_forward,summarize_backtest,nested_walk_forwar
 from md_lotto.simulation import monte_carlo,theoretical_single_game
 from md_lotto.ml import train_evaluate,walk_forward_ml
 
-st.set_page_config(page_title='MD LOTTO 6/45 v3.1 MOBILE WEB',page_icon='🎯',layout='wide',initial_sidebar_state='collapsed')
+st.set_page_config(page_title='MD LOTTO 6/45',page_icon='🎯',layout='wide',initial_sidebar_state='collapsed')
 ROOT=Path(__file__).parent
 DATA_DIR=Path(os.getenv('MD_LOTTO_DATA_DIR', str(ROOT/'data')))
 DATA_DIR.mkdir(parents=True,exist_ok=True)
 path=DATA_DIR/'lotto_history.csv'; db=DATA_DIR/'lotto.db'; sp=DATA_DIR/'sync_status.json'
-# If a cloud runtime uses a fresh data directory, seed it from the bundled verified cache.
 bundled=ROOT/'data'/'lotto_history.csv'
-if not path.exists() and bundled.exists() and bundled.resolve()!=path.resolve():
-    path.write_bytes(bundled.read_bytes())
+if not path.exists() and bundled.exists() and bundled.resolve()!=path.resolve(): path.write_bytes(bundled.read_bytes())
 _SYNC_LOCK=threading.Lock()
-st.title('MD LOTTO 6/45 v3.1 MOBILE WEB')
-st.caption('통계·조합 최적화 연구 도구입니다. 모든 특정 6개 조합의 1등 추첨확률은 동일하며 MD Score는 당첨확률(%)이 아닙니다.')
+
 st.markdown("""
 <style>
-.block-container {padding-top: 1.1rem; padding-bottom: 2rem;}
-[data-testid="stMetric"] {border: 1px solid rgba(128,128,128,.18); padding: .7rem; border-radius: .7rem;}
-@media (max-width: 768px) {
-  .block-container {padding-left: .75rem; padding-right: .75rem;}
-  h1 {font-size: 1.65rem !important;}
-  h2, h3 {font-size: 1.2rem !important;}
-  div[data-testid="stDataFrame"] {font-size: .78rem;}
-  .stButton > button {width: 100%; min-height: 2.8rem;}
-}
+.block-container{padding-top:.65rem;padding-bottom:2.5rem;max-width:1180px}
+[data-testid="stHeader"]{background:rgba(0,0,0,0)}
+[data-testid="stMetric"]{border:1px solid rgba(128,128,128,.18);padding:.8rem;border-radius:16px;background:rgba(127,127,127,.04)}
+.hero{padding:1rem 1.05rem;border-radius:20px;background:linear-gradient(135deg,rgba(255,77,93,.14),rgba(70,130,255,.10));border:1px solid rgba(128,128,128,.15);margin:.2rem 0 1rem}
+.hero h1{margin:0;font-size:2rem;line-height:1.15}.hero p{margin:.45rem 0 0;color:#9aa0a6;font-size:.95rem}
+.status-ok{padding:.65rem .8rem;border-radius:14px;background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.28)}
+.status-warn{padding:.65rem .8rem;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28)}
+.lotto-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem}
+.ball{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem;color:white;box-shadow:inset 0 -4px 0 rgba(0,0,0,.12),0 2px 7px rgba(0,0,0,.18)}
+.b1{background:#f2b705}.b2{background:#3d8bfd}.b3{background:#ef5350}.b4{background:#8a8f98}.b5{background:#43a047}.bonus{outline:3px solid rgba(255,255,255,.28);outline-offset:2px}
+.game-card{padding:.8rem;border:1px solid rgba(128,128,128,.18);border-radius:16px;margin:.5rem 0;background:rgba(127,127,127,.035)}
+.game-title{font-weight:800;margin-bottom:.35rem}.small-note{font-size:.83rem;color:#8f949b}.section-title{font-size:1.16rem;font-weight:800;margin:.55rem 0 .4rem}
+.stButton>button{border-radius:12px;font-weight:700}
+@media(max-width:768px){.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}.ball{width:42px;height:42px;font-size:.98rem}.lotto-row{gap:.38rem}[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}}
 </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
-# Cloud-safe shared sync: one refresh is reused by every visitor for 30 minutes.
-# This avoids a full remote-history download for every browser session while still
-# ensuring that long-running cloud instances periodically re-check the latest draw.
-@st.cache_data(ttl=1800, show_spinner=False)
-def cloud_sync_tick(_bucket:int):
+def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
+def balls_html(nums,bonus=None):
+    parts=[f'<span class="ball {ball_class(int(n))}">{int(n)}</span>' for n in nums]
+    if bonus is not None: parts += ['<span style="font-weight:800;color:#8f949b">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus">{int(bonus)}</span>']
+    return '<div class="lotto-row">'+''.join(parts)+'</div>'
+def pct(v,d=2):
+    try:return f'{float(v)*100:.{d}f}%'
+    except:return '-'
+def render_backtest_summary(s):
+    c=st.columns(4); c[0].metric('테스트 회차',f"{int(s.get('tests',0)):,}"); c[1].metric('MD 평균 최고 적중',f"{s.get('md_best_mean',0):.2f}개"); c[2].metric('랜덤 평균 최고 적중',f"{s.get('random_div_best_mean',0):.2f}개"); c[3].metric('우위 근거','있음' if s.get('evidence_of_edge') else '없음')
+    st.caption(f"승 {s.get('head_to_head_wins',0)} · 패 {s.get('losses',0)} · 무 {s.get('ties',0)} · Sign test p={s.get('sign_test_p_value',1):.4f}")
+    if 'md_realized_roi' in s:
+        a,b,c=st.columns(3); a.metric('총 구매비',f"₩{s.get('md_total_cost',0):,.0f}"); b.metric('과거 지급액',f"₩{s.get('md_total_payout',0):,.0f}"); c.metric('과거 ROI',pct(s.get('md_realized_roi',0),1))
+
+@st.cache_data(ttl=1800,show_spinner=False)
+def cloud_sync_tick(_bucket):
     with _SYNC_LOCK:
         try:
-            d,ss=sync_history(path,verify_official_count=3)
-            save_sqlite(d,db); save_sync_status(ss,sp)
-            return ss
-        except Exception as e:
-            return {'ok':False,'error':str(e),'using_cached_data':path.exists()}
+            d,ss=sync_history(path,verify_official_count=3); save_sqlite(d,db); save_sync_status(ss,sp); return ss
+        except Exception as e:return {'ok':False,'error':str(e),'using_cached_data':path.exists()}
 
-# Bucket changes every 30 minutes. A new browser visit/rerun after that point refreshes once.
-startup_status=cloud_sync_tick(int(time.time()//1800))
-st.session_state['startup_sync_status']=startup_status
+startup_status=cloud_sync_tick(int(time.time()//1800)); st.session_state['startup_sync_status']=startup_status
+if not path.exists(): st.error('데이터 파일을 준비하지 못했습니다. 잠시 뒤 다시 실행해 주세요.'); st.stop()
+df=load_csv(path); status=dataset_status(df); ns=number_stats(df); latest=df.iloc[-1]; ss=st.session_state.get('startup_sync_status') or load_sync_status(sp)
+
+st.markdown('<div class="hero"><h1>🎯 MD LOTTO 6/45</h1><p>과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</p></div>',unsafe_allow_html=True)
+if ss.get('ok'): st.markdown(f'<div class="status-ok">✅ <b>데이터 정상</b> · 1회~{status.get("max_draw")}회 · 자동 동기화 확인</div>',unsafe_allow_html=True)
+else: st.markdown('<div class="status-warn">⚠️ <b>온라인 최신 확인 실패</b> · 마지막 검증 데이터를 사용 중입니다.</div>',unsafe_allow_html=True)
+nums=[int(latest[f'n{i}']) for i in range(1,7)]; bonus=int(latest.bonus)
+st.markdown(f'<div class="section-title">제 {int(latest.draw_no)}회 최신 당첨번호</div>',unsafe_allow_html=True); st.markdown(balls_html(nums,bonus),unsafe_allow_html=True)
+a,b,c,d=st.columns(4); a.metric('분석 회차',f'{len(df):,}'); b.metric('최신 회차',f'{int(latest.draw_no)}회'); c.metric('최신 추첨일',latest.draw_date.strftime('%Y-%m-%d')); d.metric('1등 확률','1 / 8,145,060')
+st.caption('모든 특정 6개 조합의 1등 추첨확률은 동일합니다. MD Score는 당첨확률이 아닙니다.')
 
 with st.sidebar:
-    st.header('데이터 상태')
-    ss=st.session_state.get('startup_sync_status') or load_sync_status(sp)
-    if ss.get('ok'): st.success(f"자동 동기화 완료 · 최신 {ss.get('max_draw',ss.get('latest_remote'))}회")
-    else: st.warning('온라인 최신 확인 실패 · 검증된 로컬 캐시 사용 중')
-    if ss.get('official_verified'): st.caption(f"최근 {ss.get('official_checked')}회 공식 교차확인 통과")
-    elif ss.get('ok'): st.caption('공식 JSON 교차확인은 응답 제한 등으로 생략될 수 있습니다.')
-    if st.button('지금 다시 동기화',use_container_width=True):
-        try:
-            cloud_sync_tick.clear()
-            with st.spinner('최신 전체 이력 검증·동기화 중...'):
-                ss=cloud_sync_tick(int(time.time()//1800))
-            st.session_state['startup_sync_status']=ss
-            if ss.get('ok'): st.success(f"최신 {ss.get('max_draw')}회까지 동기화 완료")
-            else: st.warning('최신 확인 실패 · 기존 검증 캐시를 유지합니다.')
-            st.rerun()
-        except Exception as e: st.error(str(e))
+    st.header('데이터 관리'); st.success(f"최신 {status.get('max_draw')}회까지 확인") if ss.get('ok') else st.warning('온라인 최신 확인 실패'); st.caption('누락 없음' if status.get('complete_from_draw1') else '일부 회차 누락 가능')
+    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True):
+        cloud_sync_tick.clear(); new_ss=cloud_sync_tick(int(time.time()//1800)); st.session_state['startup_sync_status']=new_ss; st.rerun()
+    st.caption('동기화 실패 시 기존 검증 데이터는 보존됩니다.')
 
-if not path.exists(): st.error('데이터 파일이 없습니다. 인터넷 연결 후 update_data.py를 실행하세요.'); st.stop()
-df=load_csv(path); status=dataset_status(df); ns=number_stats(df); latest=df.iloc[-1]
-if not status['complete_from_draw1']: st.error(f"PARTIAL DATA: {status['min_draw']}~{status['max_draw']}회만 있습니다. 전체 동기화 전 연구 결과를 실전 판단에 사용하지 마세요.")
-a,b,c,d=st.columns(4); a.metric('분석 회차',f'{len(df):,}'); b.metric('최신 회차',f'{int(latest.draw_no)}회'); c.metric('최신 추첨일',latest.draw_date.strftime('%Y-%m-%d')); d.metric('1등 확률','1 / 8,145,060')
+if not status['complete_from_draw1']: st.error(f"현재 데이터가 {status['min_draw']}~{status['max_draw']}회만 있습니다.")
+tabs=st.tabs(['대시보드','번호 분석','Pair/Triple','추천 조합','시뮬레이션','백테스트','고급 검증','AI 진단','ROI','도움말'])
 
-tabs=st.tabs(['대시보드','번호 Lab','FDR Pair/Triple','MD Optimizer','Monte Carlo','Backtest','Nested Tune','Strategy Tournament','ML Lab','ROI/EV','사용법'])
 with tabs[0]:
-    st.subheader('데이터·무작위성 진단'); st.json({**status,**structure_summary(df),**randomness_audit(df)})
-    fig=px.bar(ns,x='number',y='count_all',hover_data=['count_20','count_100','current_gap','z_score']); st.plotly_chart(fig,use_container_width=True)
-with tabs[1]: st.dataframe(ns,use_container_width=True,hide_index=True)
+    st.subheader('데이터 상태'); audit=randomness_audit(df); struct=structure_summary(df); c=st.columns(4); c[0].metric('전체 회차',f"{status['draws']:,}"); c[1].metric('연속 데이터','정상' if status['contiguous'] else '점검 필요'); c[2].metric('당첨금 데이터','있음' if status.get('has_prize_data') else '없음'); c[3].metric('균등성 검정','특이점 없음' if audit.get('p_value',0)>=.05 else '검토 필요')
+    st.caption(f"번호합 평균 {struct.get('sum_mean',0):.1f} · 10~90% 범위 {struct.get('sum_q10',0):.0f}~{struct.get('sum_q90',0):.0f} · 흔한 홀수 개수 {struct.get('odd_mode','-')}개")
+    fig=px.bar(ns,x='number',y='count_all',hover_data=['count_20','count_100','current_gap','z_score'],labels={'number':'번호','count_all':'전체 출현'}); fig.update_layout(margin=dict(l=0,r=0,t=15,b=0),height=360); st.plotly_chart(fig,use_container_width=True)
+    with st.expander('통계 진단 설명'): st.write('균등성 검정은 과거 출현빈도 치우침을 점검하는 감사 도구입니다. 미래 예측력을 의미하지 않습니다.'); st.write(f"보정 χ² p-value: {audit.get('p_value',1):.4f}")
+with tabs[1]:
+    view=ns[['number','count_all','count_20','count_50','count_100','count_300','current_gap','mean_gap','z_score']].copy(); view.columns=['번호','전체','최근20','최근50','최근100','최근300','현재 미출현','평균 간격','Z-score']; st.dataframe(view,use_container_width=True,hide_index=True); st.caption('Hot/Cold와 Gap은 과거 상태를 설명할 뿐 “나올 차례”를 의미하지 않습니다.')
 with tabs[2]:
-    st.info('990개 Pair와 14,190개 Triple에 Benjamini–Hochberg FDR 보정을 적용합니다. 유의성은 예측력이 아니라 과거 데이터 감사용입니다.')
-    if st.button('FDR 전체 검정 실행'):
-        with st.spinner('14,190개 Triple 검정 중...'): st.json(fdr_summary(df))
-    ps=pair_stats(df,with_tests=True); st.subheader('Pair 상위 관측'); st.dataframe(ps.head(100),use_container_width=True,hide_index=True)
-    ts=triple_stats(df,min_count=2,with_tests=True); st.subheader('반복 Triple'); st.dataframe(ts.head(100),use_container_width=True,hide_index=True)
+    st.info('다중 비교 착시를 줄이기 위해 Benjamini–Hochberg FDR 보정을 사용합니다.')
+    if st.button('🔬 전체 FDR 검정 실행',use_container_width=True):
+        with st.spinner('검정 중...'): f=fdr_summary(df)
+        c=st.columns(4); c[0].metric('Pair 검사',f"{f.get('pair_tests',0):,}"); c[1].metric('Pair 유의',f"{f.get('pair_fdr_significant',0):,}"); c[2].metric('Triple 검사',f"{f.get('triple_tests',0):,}"); c[3].metric('Triple 유의',f"{f.get('triple_fdr_significant',0):,}")
+    ps=pair_stats(df,with_tests=True).head(50).copy(); ps['번호쌍']=ps.apply(lambda r:f"{int(r.a):02d}-{int(r.b):02d}",axis=1); st.dataframe(ps[['번호쌍','count','expected','lift','fdr_q_value']].rename(columns={'count':'출현','expected':'기대','lift':'배율','fdr_q_value':'FDR q'}),use_container_width=True,hide_index=True)
+    ts=triple_stats(df,min_count=2,with_tests=True).head(50).copy(); ts['번호 3개']=ts.apply(lambda r:f"{int(r.a):02d}-{int(r.b):02d}-{int(r.c):02d}",axis=1); st.dataframe(ts[['번호 3개','count','expected','fdr_q_value']].rename(columns={'count':'출현','expected':'기대','fdr_q_value':'FDR q'}),use_container_width=True,hide_index=True)
 with tabs[3]:
-    game_count=st.slider('게임 수',5,20,10,key='opt_games'); pool=st.slider('후보 Pool 크기',12,30,20)
-    games=optimize_games(df,ns,games=game_count,pool_size=pool,sample_combos=20000)
-    show=games.copy(); show['combo']=show.combo.apply(lambda x:' · '.join(f'{n:02d}' for n in x)); st.dataframe(show,use_container_width=True,hide_index=True)
-    st.json({'coverage':games.attrs.get('coverage',{}),'candidate_pool':games.attrs.get('pool',[])})
+    c1,c2=st.columns(2); game_count=c1.slider('게임 수',5,20,10,key='opt_games'); pool=c2.slider('후보 Pool',12,30,20)
+    if st.button('🎯 추천 조합 만들기',type='primary',use_container_width=True):
+        with st.spinner('조합 최적화 중...'): st.session_state['md_games']=optimize_games(df,ns,games=game_count,pool_size=pool,sample_combos=20000)
+    games=st.session_state.get('md_games')
+    if games is not None and len(games):
+        for i,row in games.iterrows(): st.markdown(f'<div class="game-card"><div class="game-title">GAME {i+1:02d} · MD Score {float(row.get("md_score",0)):.1f}</div>{balls_html(row.combo)}<div class="small-note">새 Pair {int(row.get("new_pairs",0))} · Triple {int(row.get("new_triples",0))} · Quad {int(row.get("new_quads",0))}</div></div>',unsafe_allow_html=True)
+        cov=games.attrs.get('coverage',{}); c=st.columns(3); c[0].metric('고유 Pair',cov.get('unique_pairs',0)); c[1].metric('고유 Triple',cov.get('unique_triples',0)); c[2].metric('고유 Quad',cov.get('unique_quads',0))
+    else: st.info('「추천 조합 만들기」를 누르세요.')
 with tabs[4]:
-    games=optimize_games(df,ns,games=10,sample_combos=12000); sims=st.select_slider('시뮬레이션',[10000,50000,100000,500000],value=100000)
-    if st.button('Monte Carlo 실행'):
-        r=monte_carlo(games.combo.tolist(),sims); st.json(r); st.caption('Monte Carlo는 전략의 구조적 분포를 확인하는 도구이며 미래 번호를 예측하지 않습니다.')
+    sims=st.select_slider('가상 추첨 횟수',[10000,50000,100000,500000],value=100000)
+    if st.button('🎲 시뮬레이션 실행',use_container_width=True):
+        games=st.session_state.get('md_games')
+        if games is None or not len(games): games=optimize_games(df,ns,games=10,sample_combos=12000)
+        with st.spinner(f'{sims:,}회 가상 추첨 중...'): r=monte_carlo(games.combo.tolist(),sims)
+        c=st.columns(3); c[0].metric('가상 추첨',f"{r['simulations']:,}회"); c[1].metric('1회 이상 당첨',pct(r['any_prize_probability'],3)); c[2].metric('평균 당첨 티켓',f"{r['mean_winning_tickets']:.4f}")
+        labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등','none':'미당첨'}; st.dataframe(pd.DataFrame([{'최고 결과':labels[k],'확률':pct(v,4)} for k,v in r['best_rank_probability'].items()]),use_container_width=True,hide_index=True)
 with tabs[5]:
     tests=st.slider('최근 테스트 회차',10,150,30,10,key='bt_tests')
-    if st.button('표준 Walk-forward 실행'):
-        if len(df)<320: st.error('최소 320회 이상 필요')
-        else:
-            with st.spinner('검증 중...'): bt=walk_forward(df,start_train=300,max_tests=tests,sample_combos=2500,random_reps=100)
-            st.json(summarize_backtest(bt)); st.dataframe(bt,use_container_width=True,hide_index=True)
+    if st.button('📈 백테스트 실행',use_container_width=True):
+        with st.spinner('검증 중...'): st.session_state['last_bt']=walk_forward(df,start_train=300,max_tests=tests,sample_combos=2500,random_reps=100)
+    bt=st.session_state.get('last_bt')
+    if bt is not None and len(bt): render_backtest_summary(summarize_backtest(bt)); st.caption('우위 근거가 없으면 랜덤보다 낫다고 해석하지 않습니다.');
 with tabs[6]:
-    st.write('각 외부 테스트 회차 직전에 과거 데이터 안에서만 가중치를 선택하는 Nested Walk-forward입니다. 가장 엄격하고 계산량이 많습니다.')
-    nt=st.slider('Outer 테스트 회차',5,40,12,key='nested_tests')
-    if st.button('Nested Walk-forward 실행'):
-        with st.spinner('내부 튜닝 + 외부 검증 중...'):
-            bt=nested_walk_forward(df,start_train=360,max_tests=nt,inner_draws=16,sample_combos=1000,random_reps=60)
-        st.json(summarize_backtest(bt)); st.dataframe(bt,use_container_width=True,hide_index=True)
+    mode=st.radio('검증 방식',['Nested Walk-forward','Strategy Tournament'],horizontal=True)
+    if mode=='Nested Walk-forward':
+        nt=st.slider('Outer 테스트 회차',5,40,12,key='nested_tests')
+        if st.button('🧪 Nested 검증 실행',use_container_width=True):
+            with st.spinner('검증 중...'): bt=nested_walk_forward(df,start_train=360,max_tests=nt,inner_draws=16,sample_combos=1000,random_reps=60)
+            render_backtest_summary(summarize_backtest(bt)); st.dataframe(bt,use_container_width=True,hide_index=True)
+    else:
+        if st.button('🏁 전략 토너먼트 실행',use_container_width=True):
+            with st.spinner('전략 비교 중...'): tour=strategy_tournament(df,start_train=300,max_tests=30,sample_combos=1400)
+            st.dataframe(tour,use_container_width=True,hide_index=True)
 with tabs[7]:
-    st.write('미리 선언한 전략들을 동일 회차·동일 게임 수·동일 overlap 조건으로 비교합니다.')
-    if st.button('Strategy Tournament 실행'):
-        with st.spinner('전략 토너먼트 중...'): tour=strategy_tournament(df,start_train=300,max_tests=30,sample_combos=1400)
-        st.dataframe(tour,use_container_width=True,hide_index=True)
-with tabs[8]:
-    if st.button('ML 시간순 Holdout'): st.json(train_evaluate(df))
-    if st.button('ML 완전 Walk-forward'):
+    c1,c2=st.columns(2)
+    if c1.button('시간순 Holdout',use_container_width=True):
+        r=train_evaluate(df)
+        if r.get('available'):
+            c=st.columns(3); c[0].metric('AUC',f"{r['roc_auc_out_of_sample']:.3f}"); c[1].metric('Model Log-loss',f"{r['log_loss_out_of_sample']:.4f}"); c[2].metric('기본보다 우수','예' if r['beats_constant_logloss'] else '아니오')
+    if c2.button('완전 Walk-forward',use_container_width=True):
         with st.spinner('회차별 재학습 중...'): r=walk_forward_ml(df,start_train=300,max_tests=30)
-        rows=r.pop('rows',[]); st.json(r); st.dataframe(pd.DataFrame(rows),use_container_width=True,hide_index=True)
-with tabs[9]:
-    st.subheader('실제 과거 당첨금 기반 ROI 연구')
+        if r.get('available'):
+            rows=r.pop('rows',[]); c=st.columns(3); c[0].metric('테스트',r['tests']); c[1].metric('평균 AUC',f"{r['mean_auc']:.3f}"); c[2].metric('평균 Top6 적중',f"{r['mean_top6_hits']:.2f}개"); st.caption(f"평균 Log-loss {r['mean_log_loss']:.4f} · 기본 {r['mean_baseline_log_loss']:.4f}")
+with tabs[8]:
     if status.get('has_prize_data'):
-        st.write('과거 각 회차의 실제 등위별 1게임당 당첨금으로 백테스트 지급액을 계산합니다. 세금·구매행동·미수령 등은 반영하지 않습니다.')
-        if st.button('ROI 백테스트 실행'):
-            with st.spinner('ROI 계산 중...'): bt=walk_forward(df,start_train=300,max_tests=50,sample_combos=1800,random_reps=80)
-            st.json(summarize_backtest(bt)); cols=[c for c in ['draw_no','md_cost','md_payout','md_roi','random_div_payout_mean','random_div_roi_mean'] if c in bt]; st.dataframe(bt[cols],use_container_width=True,hide_index=True)
-    else: st.warning('현재 로컬 데이터에는 등위별 당첨금 필드가 없습니다. 최신 전체 데이터 동기화 후 활성화됩니다.')
-    st.subheader('이론적 단일게임 확률'); st.json(theoretical_single_game())
-with tabs[10]:
-    st.markdown('''### v3.1 ONLINE 권장 사용 순서
-1. 실행 시 **자동 최신 데이터 동기화 상태** 확인
-2. 데이터/무작위성/FDR 감사
-3. 표준 Backtest → Strategy Tournament → Nested Walk-forward
-4. ML은 반드시 Walk-forward 기준선과 비교
-5. Optimizer와 Monte Carlo는 마지막에 조합 묶음을 구성·검토하는 용도로 사용
-
-**중요:** 과거 데이터에서 우위가 보여도 미래 당첨확률 상승을 보장하지 않습니다. 네트워크 장애 시 앱은 검증된 로컬 데이터를 보존하며 최신 확인 실패를 표시합니다.''')
+        st.info('실제 과거 등위별 당첨금을 이용한 연구용 백테스트입니다. 미래 수익을 보장하지 않습니다.')
+        if st.button('💰 ROI 백테스트 실행',use_container_width=True):
+            with st.spinner('계산 중...'): bt=walk_forward(df,start_train=300,max_tests=50,sample_combos=1800,random_reps=80)
+            render_backtest_summary(summarize_backtest(bt))
+    else: st.warning('현재 데이터에 등위별 당첨금 필드가 없습니다.')
+    probs=theoretical_single_game(); labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등'}; st.dataframe(pd.DataFrame([{'등위':labels[k],'확률':pct(v,6),'약 1 / N':f"1 / {round(1/v):,}"} for k,v in probs.items()]),use_container_width=True,hide_index=True)
+with tabs[9]:
+    st.markdown('''**권장 사용 순서**\n1. 상단의 데이터 정상 표시 확인\n2. 번호 분석과 Pair/Triple로 과거 상태 확인\n3. 백테스트·고급 검증·AI 진단으로 랜덤 기준선과 비교\n4. 마지막에 추천 조합 생성 및 시뮬레이션\n\n**중요**\n- 모든 특정 6개 조합의 1등 확률은 같습니다.\n- Hot/Cold, Gap, Pair, Triple은 과거 통계일 뿐 미래를 보장하지 않습니다.\n- MD Score는 당첨확률이 아닙니다.''')
+    st.caption('MD LOTTO 6/45 · Final Mobile UI')

@@ -29,7 +29,7 @@ from md_lotto.backtest import walk_forward,summarize_backtest,nested_walk_forwar
 from md_lotto.simulation import monte_carlo,theoretical_single_game
 from md_lotto.ml import train_evaluate,walk_forward_ml
 
-st.set_page_config(page_title='MD LOTTO 6/45',page_icon='🎯',layout='wide',initial_sidebar_state='collapsed')
+st.set_page_config(page_title='MD LOTTO 6/45', page_icon='🎯', layout='wide', initial_sidebar_state='collapsed')
 ROOT=Path(__file__).parent
 DATA_DIR=Path(os.getenv('MD_LOTTO_DATA_DIR', str(ROOT/'data')))
 DATA_DIR.mkdir(parents=True,exist_ok=True)
@@ -38,74 +38,37 @@ bundled=ROOT/'data'/'lotto_history.csv'
 if not path.exists() and bundled.exists() and bundled.resolve()!=path.resolve(): path.write_bytes(bundled.read_bytes())
 _SYNC_LOCK=threading.Lock()
 
-st.markdown("""
+st.markdown(r"""
 <style>
-.block-container{padding-top:.65rem;padding-bottom:2.5rem;max-width:1180px}
-[data-testid="stHeader"]{background:rgba(0,0,0,0)}
-[data-testid="stMetric"]{border:1px solid rgba(128,128,128,.18);padding:.8rem;border-radius:16px;background:rgba(127,127,127,.04)}
-.hero{padding:1rem 1.05rem;border-radius:20px;background:linear-gradient(135deg,rgba(255,77,93,.14),rgba(70,130,255,.10));border:1px solid rgba(128,128,128,.15);margin:.2rem 0 1rem}
-.hero h1{margin:0;font-size:2rem;line-height:1.15}.hero p{margin:.45rem 0 0;color:#9aa0a6;font-size:.95rem}
-.status-ok{padding:.65rem .8rem;border-radius:14px;background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.28)}
-.status-warn{padding:.65rem .8rem;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28)}
-.lotto-row{display:flex;gap:.72rem;flex-wrap:wrap;align-items:center;margin:.78rem 0 1.25rem;padding:.3rem .08rem .7rem;perspective:1000px}
-.ball{
-  --c1:#f6c515;--c2:#d99b00;--c3:#8b5c00;
-  position:relative;width:62px;height:62px;flex:0 0 62px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-  background:
-    radial-gradient(circle at 30% 20%,rgba(255,255,255,.98) 0 4%,rgba(255,255,255,.63) 5%,rgba(255,255,255,0) 20%),
-    radial-gradient(circle at 38% 32%,var(--c1) 0 22%,var(--c2) 57%,var(--c3) 100%);
-  border:1px solid rgba(255,255,255,.58);
-  box-shadow:
-    inset 8px 10px 15px rgba(255,255,255,.32),
-    inset -11px -14px 18px rgba(0,0,0,.39),
-    inset 0 0 0 3px rgba(255,255,255,.10),
-    0 2px 0 rgba(255,255,255,.20),
-    0 9px 14px rgba(0,0,0,.38),
-    0 16px 25px rgba(0,0,0,.18);
-  transform:translateZ(0);isolation:isolate;
-}
-.ball::before{content:"";position:absolute;left:10%;top:8%;width:42%;height:24%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.12));filter:blur(.15px);transform:rotate(-28deg);opacity:.92;z-index:1;pointer-events:none}
-.ball::after{content:"";position:absolute;left:12%;right:12%;bottom:-9px;height:11px;border-radius:50%;background:rgba(0,0,0,.38);filter:blur(5px);z-index:-2;pointer-events:none}
-.ball-num{
-  position:relative;z-index:3;width:68%;height:68%;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-weight:1000;font-size:1.68rem;line-height:1;letter-spacing:-.055em;color:#fff;
-  -webkit-text-stroke:1.15px rgba(15,18,24,.88);
-  text-shadow:0 2px 1px rgba(0,0,0,.78),0 0 4px rgba(0,0,0,.58),0 1px 8px rgba(0,0,0,.32);
-  background:radial-gradient(circle at 38% 30%,rgba(255,255,255,.22),rgba(255,255,255,.08) 42%,rgba(0,0,0,.15) 100%);
-  box-shadow:inset 0 1px 2px rgba(255,255,255,.28),inset 0 -2px 4px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.08);
-}
-.b1{--c1:#ffe56a;--c2:#f4b900;--c3:#8e5700}
-.b2{--c1:#76c5ff;--c2:#2588f7;--c3:#073c98}
-.b3{--c1:#ff8986;--c2:#ef414b;--c3:#8d1929}
-.b4{--c1:#d6dbe1;--c2:#89919c;--c3:#3d444e}
-.b5{--c1:#7be285;--c2:#39ad4e;--c3:#145d24}
-.bonus{width:66px;height:66px;flex-basis:66px;box-shadow:inset 8px 10px 15px rgba(255,255,255,.33),inset -12px -15px 19px rgba(0,0,0,.42),inset 0 0 0 3px rgba(255,255,255,.12),0 0 0 3px rgba(255,255,255,.20),0 0 0 6px rgba(255,205,78,.42),0 11px 20px rgba(0,0,0,.44),0 0 24px rgba(255,205,78,.22)}
-.bonus .ball-num{font-size:1.78rem}
-.bonus-label{display:inline-flex;align-items:center;justify-content:center;font-weight:1000;color:#c2c6ce;font-size:1.55rem;margin:0 .04rem;text-shadow:0 2px 3px rgba(0,0,0,.65)}
-.game-card{padding:.8rem;border:1px solid rgba(128,128,128,.18);border-radius:16px;margin:.5rem 0;background:rgba(127,127,127,.035)}
-.game-title{font-weight:800;margin-bottom:.35rem}.small-note{font-size:.83rem;color:#8f949b}.section-title{font-size:1.16rem;font-weight:800;margin:.55rem 0 .4rem}
-.stButton>button{border-radius:12px;font-weight:700}
-@media(max-width:768px){
-.block-container{padding-left:.72rem;padding-right:.72rem;padding-top:.45rem}
-.hero h1{font-size:1.55rem}.hero p{font-size:.86rem}
-.lotto-row{gap:.42rem;margin:.72rem 0 1.12rem;padding:.3rem 0 .72rem}
-.ball{width:50px;height:50px;flex-basis:50px}
-.ball-num{width:70%;height:70%;font-size:1.42rem;-webkit-text-stroke:1px rgba(15,18,24,.9);text-shadow:0 2px 1px rgba(0,0,0,.78),0 0 4px rgba(0,0,0,.55)}
-.bonus{width:54px;height:54px;flex-basis:54px}
-.bonus .ball-num{font-size:1.52rem}
-.bonus-label{font-size:1.38rem}
-.game-card .lotto-row{gap:.34rem}.game-card .ball{width:47px;height:47px;flex-basis:47px}.game-card .ball-num{font-size:1.30rem}
-[data-testid="stMetric"]{padding:.65rem}.stButton>button{width:100%;min-height:2.85rem}h2{font-size:1.3rem!important}h3{font-size:1.1rem!important}div[data-testid="stDataFrame"]{font-size:.78rem}
-}
-@media(max-width:390px){.ball{width:48px;height:48px;flex-basis:48px}.ball-num{font-size:1.36rem}.lotto-row{gap:.32rem}.bonus{width:52px;height:52px;flex-basis:52px}.bonus .ball-num{font-size:1.46rem}}
+:root{--bg:#050814;--panel:#0a1020;--line:#1d2b46;--muted:#98a4b8;--blue:#1687ff;--green:#28d06f;--red:#ff4f6d;--violet:#9c5cff;--gold:#ffcc33}
+html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif}
+.stApp{background:radial-gradient(circle at 15% 0%,rgba(22,135,255,.12),transparent 28%),radial-gradient(circle at 88% 15%,rgba(156,92,255,.10),transparent 26%),linear-gradient(180deg,#050814 0%,#070b15 100%);color:#f5f7fb}
+.block-container{max-width:1120px;padding-top:.45rem;padding-bottom:6.2rem}[data-testid="stHeader"]{background:transparent}#MainMenu,footer{visibility:hidden}
+.hero-shell{position:relative;overflow:hidden;padding:1.2rem 1.25rem 1.05rem;border-radius:24px;background:linear-gradient(135deg,rgba(29,12,28,.96),rgba(7,14,31,.96));border:1px solid #263556;box-shadow:0 18px 42px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);margin:.2rem 0 1rem}
+.hero-shell:before{content:"";position:absolute;inset:-40% 35% 35% -20%;background:radial-gradient(circle,rgba(255,60,110,.22),transparent 60%);pointer-events:none}.brand-row{display:flex;align-items:center;gap:.75rem;position:relative;z-index:1}
+.brand-target{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:2rem;background:radial-gradient(circle,#fff 0 12%,#e53b49 13% 27%,#fff 28% 40%,#c80f21 41% 59%,#650713 60% 100%);box-shadow:0 7px 20px rgba(255,50,80,.32),inset 0 0 0 2px rgba(255,255,255,.55)}
+.brand-title{font-size:clamp(1.8rem,5vw,2.55rem);font-weight:1000;letter-spacing:-.045em;line-height:1;background:linear-gradient(180deg,#fff,#eef1f7 56%,#b8beca);-webkit-background-clip:text;color:transparent;text-shadow:0 8px 20px rgba(0,0,0,.24)}.brand-sub{position:relative;z-index:1;color:#aeb8c9;margin:.65rem 0 0;font-size:.93rem}
+.sync-ok,.sync-warn{display:flex;align-items:center;gap:.75rem;padding:.78rem .92rem;border-radius:16px;margin:.45rem 0 1rem;font-weight:750}.sync-ok{background:linear-gradient(90deg,rgba(18,82,50,.44),rgba(6,27,25,.72));border:1px solid rgba(45,214,112,.38)}.sync-warn{background:linear-gradient(90deg,rgba(104,62,11,.38),rgba(40,26,8,.70));border:1px solid rgba(255,180,55,.38)}.sync-icon{font-size:1.25rem}.sync-main{font-size:1.02rem}.sync-detail{color:#d7deea;font-weight:550}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin:1rem 0 .5rem}.section-title{font-size:1.27rem;font-weight:950}.date-chip{font-size:.83rem;color:#b8dcff;padding:.36rem .62rem;border-radius:10px;background:#0b2242;border:1px solid #174d87}
+.lotto-row{display:flex;gap:.56rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.28rem 0 .9rem;perspective:1000px}.ball{--c1:#ffe06a;--c2:#f1ad00;--c3:#7b4b00;position:relative;width:70px;height:70px;flex:0 0 70px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 18%,#fff 0 5%,rgba(255,255,255,.74) 6%,transparent 18%),radial-gradient(circle at 37% 31%,var(--c1) 0 24%,var(--c2) 58%,var(--c3) 100%);border:1px solid rgba(255,255,255,.78);box-shadow:inset 10px 12px 18px rgba(255,255,255,.34),inset -13px -17px 22px rgba(0,0,0,.45),inset 0 0 0 3px rgba(255,255,255,.10),0 12px 18px rgba(0,0,0,.42)}
+.ball:before{content:"";position:absolute;left:9%;top:7%;width:46%;height:26%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.05));transform:rotate(-27deg);opacity:.92}.ball:after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:12px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(6px);z-index:-1}
+.ball-num{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:72%;height:72%;border-radius:50%;font-size:2.05rem;font-weight:1000;line-height:1;letter-spacing:-.06em;color:#fff;-webkit-text-stroke:1.45px rgba(3,6,12,.92);text-shadow:0 3px 2px rgba(0,0,0,.85),0 0 5px rgba(0,0,0,.62),0 0 10px rgba(0,0,0,.28);background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.28),rgba(255,255,255,.06) 44%,rgba(0,0,0,.17) 100%);box-shadow:inset 0 1px 3px rgba(255,255,255,.28),inset 0 -3px 5px rgba(0,0,0,.22),0 0 0 1px rgba(255,255,255,.12)}
+.b1{--c1:#ffe46a;--c2:#f2b400;--c3:#835100}.b2{--c1:#78c6ff;--c2:#1687ff;--c3:#063880}.b3{--c1:#ff8f8e;--c2:#ed3547;--c3:#861524}.b4{--c1:#e3e5e8;--c2:#8d929c;--c3:#393f49}.b5{--c1:#8ce88c;--c2:#38b44b;--c3:#145923}.bonus{width:76px;height:76px;flex-basis:76px;box-shadow:inset 10px 12px 18px rgba(255,255,255,.35),inset -14px -18px 23px rgba(0,0,0,.47),0 0 0 3px #ffbd28,0 0 0 6px rgba(255,220,88,.22),0 14px 22px rgba(0,0,0,.48)}.bonus .ball-num{font-size:2.12rem}.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
+.legend{display:flex;gap:.9rem;flex-wrap:wrap;padding:.55rem .7rem;border-radius:14px;border:1px solid #1b2a43;background:#090f1b;margin:-.15rem 0 1rem;color:#d5dbe5;font-size:.78rem}.legend span{display:flex;align-items:center;gap:.32rem}.dot{width:11px;height:11px;border-radius:50%}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.55rem 0 1rem}.kpi{position:relative;overflow:hidden;border-radius:17px;padding:.82rem .85rem 1rem;border:1px solid #24334e;background:linear-gradient(145deg,#0c1423,#08101c);min-height:112px;box-shadow:0 12px 26px rgba(0,0,0,.22)}.kpi:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(25,132,255,.18),transparent 45%)}.kpi.purple:before{background:radial-gradient(circle at 10% 0%,rgba(158,77,255,.20),transparent 48%)}.kpi.red:before{background:radial-gradient(circle at 10% 0%,rgba(255,65,106,.20),transparent 48%)}.kpi-label{position:relative;color:#c9d2e1;font-size:.82rem;font-weight:750}.kpi-value{position:relative;font-size:1.75rem;font-weight:950;margin-top:.55rem}.kpi-value.redv{color:#ff5c7a}.kpi-sub{position:relative;font-size:.73rem;color:#7f8ba0;margin-top:.12rem}
+.menu-title{font-size:1.15rem;font-weight:950;margin:.5rem 0 .55rem}.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin-bottom:1rem}.menu-card{border:1px solid #243450;border-radius:15px;padding:.75rem .55rem;text-align:center;background:linear-gradient(160deg,#0d1728,#08111f);box-shadow:0 10px 24px rgba(0,0,0,.22)}.menu-card.blue{border-color:#155aa4;background:linear-gradient(160deg,#0c315f,#07182d)}.menu-card.green{border-color:#2e6f31;background:linear-gradient(160deg,#153b18,#08190d)}.menu-card.orange{border-color:#8b5117;background:linear-gradient(160deg,#4b270d,#1b1006)}.menu-card.violet{border-color:#67318b;background:linear-gradient(160deg,#351449,#16091f)}.menu-icon{font-size:1.55rem}.menu-name{font-weight:900;margin-top:.25rem}.menu-desc{font-size:.68rem;color:#bac4d4;margin-top:.15rem}
+[data-testid="stMetric"]{border:1px solid #24334e!important;border-radius:15px!important;background:linear-gradient(145deg,#0c1423,#08101c)!important;padding:.75rem!important;box-shadow:0 10px 22px rgba(0,0,0,.18)}[data-testid="stMetricLabel"]{color:#aeb8c8}[data-testid="stMetricValue"]{color:#f7f9fc}.stButton>button{border-radius:12px!important;font-weight:800!important;border:1px solid #2b4772!important;background:linear-gradient(180deg,#123f73,#0b284b)!important;color:#fff!important;min-height:2.7rem}.stButton>button:hover{border-color:#41a1ff!important;box-shadow:0 8px 20px rgba(15,115,220,.22)!important}
+[data-baseweb="tab-list"]{gap:.25rem;background:#070d17;border:1px solid #1c2940;padding:.34rem;border-radius:14px;overflow-x:auto}button[data-baseweb="tab"]{height:2.65rem;border-radius:10px;padding:0 .8rem;color:#95a1b4;font-weight:800;white-space:nowrap}button[data-baseweb="tab"][aria-selected="true"]{color:#38a9ff;background:linear-gradient(180deg,#102f57,#0a1b34);box-shadow:inset 0 0 0 1px #235e99}
+.game-card{padding:.72rem;border:1px solid #22314c;border-radius:16px;margin:.55rem 0;background:linear-gradient(145deg,#0c1423,#080f1a);box-shadow:0 10px 24px rgba(0,0,0,.19)}.game-title{font-weight:900;margin-bottom:.2rem;color:#dfe7f3}.md-score{color:#ff617f}.small-note{font-size:.78rem;color:#8490a3}.game-card .lotto-row{margin:.4rem 0 .55rem;padding-bottom:.55rem}
+@media(max-width:768px){.block-container{padding-left:.66rem;padding-right:.66rem;padding-top:.3rem;padding-bottom:6.5rem}.hero-shell{padding:1rem .9rem;border-radius:21px}.brand-target{width:48px;height:48px;font-size:1.65rem}.brand-title{font-size:1.72rem}.brand-sub{font-size:.82rem}.section-title{font-size:1.12rem}.date-chip{font-size:.72rem}.lotto-row{gap:.38rem;flex-wrap:nowrap}.ball{width:53px;height:53px;flex-basis:53px}.ball-num{width:74%;height:74%;font-size:1.60rem;-webkit-text-stroke:1.15px rgba(3,6,12,.94)}.bonus{width:59px;height:59px;flex-basis:59px}.bonus .ball-num{font-size:1.72rem}.bonus-label{font-size:1.55rem}.legend{gap:.55rem;font-size:.67rem;padding:.48rem .52rem}.dot{width:9px;height:9px}.kpi-grid{gap:.45rem}.kpi{min-height:101px;padding:.72rem .62rem}.kpi-label{font-size:.72rem}.kpi-value{font-size:1.48rem}.kpi-sub{font-size:.65rem}.menu-grid{gap:.4rem}.menu-card{padding:.64rem .35rem}.menu-icon{font-size:1.35rem}.menu-name{font-size:.82rem}.menu-desc{font-size:.60rem}.game-card .ball{width:43px;height:43px;flex-basis:43px}.game-card .ball-num{font-size:1.31rem}.game-card .lotto-row{gap:.25rem;flex-wrap:nowrap}.game-title{font-size:.9rem}[data-testid="stMetric"]{padding:.6rem!important}h2{font-size:1.25rem!important}h3{font-size:1.06rem!important}div[data-testid="stDataFrame"]{font-size:.76rem}}
+@media(max-width:390px){.ball{width:50px;height:50px;flex-basis:50px}.ball-num{font-size:1.52rem}.lotto-row{gap:.29rem}.bonus{width:56px;height:56px;flex-basis:56px}.bonus .ball-num{font-size:1.64rem}.kpi-value{font-size:1.36rem}.game-card .ball{width:40px;height:40px;flex-basis:40px}.game-card .ball-num{font-size:1.21rem}}
 </style>
 """,unsafe_allow_html=True)
 
 def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
 def balls_html(nums,bonus=None):
     parts=[f'<span class="ball {ball_class(int(n))}"><span class="ball-num">{int(n)}</span></span>' for n in nums]
-    if bonus is not None:
-        parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
+    if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
@@ -126,31 +89,49 @@ def cloud_sync_tick(_bucket):
 startup_status=cloud_sync_tick(int(time.time()//1800)); st.session_state['startup_sync_status']=startup_status
 if not path.exists(): st.error('데이터 파일을 준비하지 못했습니다. 잠시 뒤 다시 실행해 주세요.'); st.stop()
 df=load_csv(path); status=dataset_status(df); ns=number_stats(df); latest=df.iloc[-1]; ss=st.session_state.get('startup_sync_status') or load_sync_status(sp)
-
-st.markdown('<div class="hero"><h1>🎯 MD LOTTO 6/45</h1><p>과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</p></div>',unsafe_allow_html=True)
-if ss.get('ok'): st.markdown(f'<div class="status-ok">✅ <b>데이터 정상</b> · 1회~{status.get("max_draw")}회 · 자동 동기화 확인</div>',unsafe_allow_html=True)
-else: st.markdown('<div class="status-warn">⚠️ <b>온라인 최신 확인 실패</b> · 마지막 검증 데이터를 사용 중입니다.</div>',unsafe_allow_html=True)
 nums=[int(latest[f'n{i}']) for i in range(1,7)]; bonus=int(latest.bonus)
-st.markdown(f'<div class="section-title">제 {int(latest.draw_no)}회 최신 당첨번호</div>',unsafe_allow_html=True); st.markdown(balls_html(nums,bonus),unsafe_allow_html=True)
-a,b,c,d=st.columns(4); a.metric('분석 회차',f'{len(df):,}'); b.metric('최신 회차',f'{int(latest.draw_no)}회'); c.metric('최신 추첨일',latest.draw_date.strftime('%Y-%m-%d')); d.metric('1등 확률','1 / 8,145,060')
-st.caption('모든 특정 6개 조합의 1등 추첨확률은 동일합니다. MD Score는 당첨확률이 아닙니다.')
+
+st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45</div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
+if ss.get('ok'): st.markdown(f'<div class="sync-ok"><span class="sync-icon">✅</span><span class="sync-main">데이터 정상</span><span class="sync-detail">· 1회 ~ {status.get("max_draw")}회 · 자동 동기화 확인</span></div>',unsafe_allow_html=True)
+else: st.markdown('<div class="sync-warn"><span class="sync-icon">⚠️</span><span class="sync-main">온라인 최신 확인 실패</span><span class="sync-detail">· 마지막 검증 데이터를 사용 중입니다.</span></div>',unsafe_allow_html=True)
+st.markdown(f'<div class="section-head"><div class="section-title">🏆 제 {int(latest.draw_no)}회 최신 당첨번호</div><div class="date-chip">추첨일 {latest.draw_date.strftime("%Y-%m-%d")}</div></div>',unsafe_allow_html=True)
+st.markdown(balls_html(nums,bonus),unsafe_allow_html=True)
+st.markdown('<div class="legend"><span><i class="dot" style="background:#f2b400"></i>1-10</span><span><i class="dot" style="background:#1687ff"></i>11-20</span><span><i class="dot" style="background:#ed3547"></i>21-30</span><span><i class="dot" style="background:#9da2aa"></i>31-40</span><span><i class="dot" style="background:#38b44b"></i>41-45</span><span><i class="dot" style="background:#ed3547"></i>보너스</span></div>',unsafe_allow_html=True)
+st.markdown(f'<div class="kpi-grid"><div class="kpi"><div class="kpi-label">📊 분석 회차</div><div class="kpi-value">{len(df):,}</div><div class="kpi-sub">총 분석 데이터</div></div><div class="kpi purple"><div class="kpi-label">🗓️ 최신 회차</div><div class="kpi-value">{int(latest.draw_no)}회</div><div class="kpi-sub">가장 최근 회차</div></div><div class="kpi red"><div class="kpi-label">📅 최신 추첨일</div><div class="kpi-value redv" style="font-size:1.28rem">{latest.draw_date.strftime("%Y-%m-%d")}</div><div class="kpi-sub">자동 동기화 기준</div></div></div>',unsafe_allow_html=True)
+st.markdown('<div class="menu-title">✨ 주요 분석 메뉴</div><div class="menu-grid"><div class="menu-card blue"><div class="menu-icon">🎲</div><div class="menu-name">번호 추천</div><div class="menu-desc">최적 번호 조합</div></div><div class="menu-card green"><div class="menu-icon">📊</div><div class="menu-name">FDR 분석</div><div class="menu-desc">패턴·확률 검증</div></div><div class="menu-card orange"><div class="menu-icon">🎯</div><div class="menu-name">백테스트</div><div class="menu-desc">과거 성과 검증</div></div><div class="menu-card violet"><div class="menu-icon">🧠</div><div class="menu-name">AI 진단</div><div class="menu-desc">종합 인사이트</div></div></div>',unsafe_allow_html=True)
 
 with st.sidebar:
     st.header('데이터 관리'); st.success(f"최신 {status.get('max_draw')}회까지 확인") if ss.get('ok') else st.warning('온라인 최신 확인 실패'); st.caption('누락 없음' if status.get('complete_from_draw1') else '일부 회차 누락 가능')
-    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True):
-        cloud_sync_tick.clear(); new_ss=cloud_sync_tick(int(time.time()//1800)); st.session_state['startup_sync_status']=new_ss; st.rerun()
+    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True): cloud_sync_tick.clear(); st.session_state['startup_sync_status']=cloud_sync_tick(int(time.time()//1800)); st.rerun()
     st.caption('동기화 실패 시 기존 검증 데이터는 보존됩니다.')
-
 if not status['complete_from_draw1']: st.error(f"현재 데이터가 {status['min_draw']}~{status['max_draw']}회만 있습니다.")
-tabs=st.tabs(['대시보드','번호 분석','Pair/Triple','추천 조합','시뮬레이션','백테스트','고급 검증','AI 진단','ROI','도움말'])
 
+tabs=st.tabs(['🏠 대시보드','🎲 번호 추천','📊 FDR 분석','🏆 백테스트','🧠 AI 진단'])
 with tabs[0]:
-    st.subheader('데이터 상태'); audit=randomness_audit(df); struct=structure_summary(df); c=st.columns(4); c[0].metric('전체 회차',f"{status['draws']:,}"); c[1].metric('연속 데이터','정상' if status['contiguous'] else '점검 필요'); c[2].metric('당첨금 데이터','있음' if status.get('has_prize_data') else '없음'); c[3].metric('균등성 검정','특이점 없음' if audit.get('p_value',0)>=.05 else '검토 필요')
+    st.subheader('데이터·무작위성 진단'); audit=randomness_audit(df); struct=structure_summary(df)
+    c=st.columns(4); c[0].metric('전체 회차',f"{status['draws']:,}"); c[1].metric('연속 데이터','정상' if status['contiguous'] else '점검 필요'); c[2].metric('당첨금 데이터','있음' if status.get('has_prize_data') else '없음'); c[3].metric('균등성 검정','특이점 없음' if audit.get('p_value',0)>=.05 else '검토 필요')
     st.caption(f"번호합 평균 {struct.get('sum_mean',0):.1f} · 10~90% 범위 {struct.get('sum_q10',0):.0f}~{struct.get('sum_q90',0):.0f} · 흔한 홀수 개수 {struct.get('odd_mode','-')}개")
-    fig=px.bar(ns,x='number',y='count_all',hover_data=['count_20','count_100','current_gap','z_score'],labels={'number':'번호','count_all':'전체 출현'}); fig.update_layout(margin=dict(l=0,r=0,t=15,b=0),height=360); st.plotly_chart(fig,use_container_width=True)
-    with st.expander('통계 진단 설명'): st.write('균등성 검정은 과거 출현빈도 치우침을 점검하는 감사 도구입니다. 미래 예측력을 의미하지 않습니다.'); st.write(f"보정 χ² p-value: {audit.get('p_value',1):.4f}")
+    fig=px.bar(ns,x='number',y='count_all',hover_data=['count_20','count_100','current_gap','z_score'],labels={'number':'번호','count_all':'전체 출현'}); fig.update_layout(margin=dict(l=0,r=0,t=15,b=0),height=330,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',font_color='#aeb8c8'); st.plotly_chart(fig,use_container_width=True)
 with tabs[1]:
-    view=ns[['number','count_all','count_20','count_50','count_100','count_300','current_gap','mean_gap','z_score']].copy(); view.columns=['번호','전체','최근20','최근50','최근100','최근300','현재 미출현','평균 간격','Z-score']; st.dataframe(view,use_container_width=True,hide_index=True); st.caption('Hot/Cold와 Gap은 과거 상태를 설명할 뿐 “나올 차례”를 의미하지 않습니다.')
+    subt=st.tabs(['추천 조합','번호 분석','시뮬레이션'])
+    with subt[0]:
+        c1,c2=st.columns(2); game_count=c1.slider('게임 수',5,20,5,key='opt_games'); pool=c2.slider('후보 Pool',12,30,20)
+        if st.button('🎯 추천 조합 만들기',type='primary',use_container_width=True):
+            with st.spinner('조합 최적화 중...'): st.session_state['md_games']=optimize_games(df,ns,games=game_count,pool_size=pool,sample_combos=20000)
+        games=st.session_state.get('md_games')
+        if games is not None and len(games):
+            for i,row in games.iterrows(): st.markdown(f'<div class="game-card"><div class="game-title">GAME {i+1:02d} <span class="md-score">· MD Score {float(row.get("md_score",0)):.1f}</span></div>{balls_html(row.combo)}<div class="small-note">새 Pair {int(row.get("new_pairs",0))} · Triple {int(row.get("new_triples",0))} · Quad {int(row.get("new_quads",0))}</div></div>',unsafe_allow_html=True)
+            cov=games.attrs.get('coverage',{}); c=st.columns(3); c[0].metric('고유 Pair',cov.get('unique_pairs',0)); c[1].metric('고유 Triple',cov.get('unique_triples',0)); c[2].metric('고유 Quad',cov.get('unique_quads',0)); st.caption('※ MD Score는 당첨확률이 아닙니다. 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+        else: st.info('「추천 조합 만들기」를 누르세요.')
+    with subt[1]:
+        view=ns[['number','count_all','count_20','count_50','count_100','count_300','current_gap','mean_gap','z_score']].copy(); view.columns=['번호','전체','최근20','최근50','최근100','최근300','현재 미출현','평균 간격','Z-score']; st.dataframe(view,use_container_width=True,hide_index=True); st.caption('Hot/Cold와 Gap은 과거 상태를 설명할 뿐 “나올 차례”를 의미하지 않습니다.')
+    with subt[2]:
+        sims=st.select_slider('가상 추첨 횟수',[10000,50000,100000,500000],value=100000)
+        if st.button('🎲 시뮬레이션 실행',use_container_width=True):
+            games=st.session_state.get('md_games'); games=games if games is not None and len(games) else optimize_games(df,ns,games=5,sample_combos=12000)
+            with st.spinner(f'{sims:,}회 가상 추첨 중...'): r=monte_carlo(games.combo.tolist(),sims)
+            c=st.columns(3); c[0].metric('가상 추첨',f"{r['simulations']:,}회"); c[1].metric('1회 이상 당첨',pct(r['any_prize_probability'],3)); c[2].metric('평균 당첨 티켓',f"{r['mean_winning_tickets']:.4f}")
+            labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등','none':'미당첨'}; st.dataframe(pd.DataFrame([{'최고 결과':labels[k],'확률':pct(v,4)} for k,v in r['best_rank_probability'].items()]),use_container_width=True,hide_index=True)
 with tabs[2]:
     st.info('다중 비교 착시를 줄이기 위해 Benjamini–Hochberg FDR 보정을 사용합니다.')
     if st.button('🔬 전체 FDR 검정 실행',use_container_width=True):
@@ -159,57 +140,38 @@ with tabs[2]:
     ps=pair_stats(df,with_tests=True).head(50).copy(); ps['번호쌍']=ps.apply(lambda r:f"{int(r.a):02d}-{int(r.b):02d}",axis=1); st.dataframe(ps[['번호쌍','count','expected','lift','fdr_q_value']].rename(columns={'count':'출현','expected':'기대','lift':'배율','fdr_q_value':'FDR q'}),use_container_width=True,hide_index=True)
     ts=triple_stats(df,min_count=2,with_tests=True).head(50).copy(); ts['번호 3개']=ts.apply(lambda r:f"{int(r.a):02d}-{int(r.b):02d}-{int(r.c):02d}",axis=1); st.dataframe(ts[['번호 3개','count','expected','fdr_q_value']].rename(columns={'count':'출현','expected':'기대','fdr_q_value':'FDR q'}),use_container_width=True,hide_index=True)
 with tabs[3]:
-    c1,c2=st.columns(2); game_count=c1.slider('게임 수',5,20,10,key='opt_games'); pool=c2.slider('후보 Pool',12,30,20)
-    if st.button('🎯 추천 조합 만들기',type='primary',use_container_width=True):
-        with st.spinner('조합 최적화 중...'): st.session_state['md_games']=optimize_games(df,ns,games=game_count,pool_size=pool,sample_combos=20000)
-    games=st.session_state.get('md_games')
-    if games is not None and len(games):
-        for i,row in games.iterrows(): st.markdown(f'<div class="game-card"><div class="game-title">GAME {i+1:02d} · MD Score {float(row.get("md_score",0)):.1f}</div>{balls_html(row.combo)}<div class="small-note">새 Pair {int(row.get("new_pairs",0))} · Triple {int(row.get("new_triples",0))} · Quad {int(row.get("new_quads",0))}</div></div>',unsafe_allow_html=True)
-        cov=games.attrs.get('coverage',{}); c=st.columns(3); c[0].metric('고유 Pair',cov.get('unique_pairs',0)); c[1].metric('고유 Triple',cov.get('unique_triples',0)); c[2].metric('고유 Quad',cov.get('unique_quads',0))
-    else: st.info('「추천 조합 만들기」를 누르세요.')
-with tabs[4]:
-    sims=st.select_slider('가상 추첨 횟수',[10000,50000,100000,500000],value=100000)
-    if st.button('🎲 시뮬레이션 실행',use_container_width=True):
-        games=st.session_state.get('md_games')
-        if games is None or not len(games): games=optimize_games(df,ns,games=10,sample_combos=12000)
-        with st.spinner(f'{sims:,}회 가상 추첨 중...'): r=monte_carlo(games.combo.tolist(),sims)
-        c=st.columns(3); c[0].metric('가상 추첨',f"{r['simulations']:,}회"); c[1].metric('1회 이상 당첨',pct(r['any_prize_probability'],3)); c[2].metric('평균 당첨 티켓',f"{r['mean_winning_tickets']:.4f}")
-        labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등','none':'미당첨'}; st.dataframe(pd.DataFrame([{'최고 결과':labels[k],'확률':pct(v,4)} for k,v in r['best_rank_probability'].items()]),use_container_width=True,hide_index=True)
-with tabs[5]:
-    tests=st.slider('최근 테스트 회차',10,150,30,10,key='bt_tests')
-    if st.button('📈 백테스트 실행',use_container_width=True):
-        with st.spinner('검증 중...'): st.session_state['last_bt']=walk_forward(df,start_train=300,max_tests=tests,sample_combos=2500,random_reps=100)
-    bt=st.session_state.get('last_bt')
-    if bt is not None and len(bt): render_backtest_summary(summarize_backtest(bt)); st.caption('우위 근거가 없으면 랜덤보다 낫다고 해석하지 않습니다.');
-with tabs[6]:
-    mode=st.radio('검증 방식',['Nested Walk-forward','Strategy Tournament'],horizontal=True)
-    if mode=='Nested Walk-forward':
-        nt=st.slider('Outer 테스트 회차',5,40,12,key='nested_tests')
-        if st.button('🧪 Nested 검증 실행',use_container_width=True):
-            with st.spinner('검증 중...'): bt=nested_walk_forward(df,start_train=360,max_tests=nt,inner_draws=16,sample_combos=1000,random_reps=60)
-            render_backtest_summary(summarize_backtest(bt)); st.dataframe(bt,use_container_width=True,hide_index=True)
-    else:
-        if st.button('🏁 전략 토너먼트 실행',use_container_width=True):
+    btabs=st.tabs(['일반 백테스트','고급 검증','ROI'])
+    with btabs[0]:
+        tests=st.slider('최근 테스트 회차',10,150,30,10,key='bt_tests')
+        if st.button('📈 백테스트 실행',use_container_width=True):
+            with st.spinner('검증 중...'): st.session_state['last_bt']=walk_forward(df,start_train=300,max_tests=tests,sample_combos=2500,random_reps=100)
+        bt=st.session_state.get('last_bt');
+        if bt is not None and len(bt): render_backtest_summary(summarize_backtest(bt)); st.caption('우위 근거가 없으면 랜덤보다 낫다고 해석하지 않습니다.')
+    with btabs[1]:
+        mode=st.radio('검증 방식',['Nested Walk-forward','Strategy Tournament'],horizontal=True)
+        if mode=='Nested Walk-forward':
+            nt=st.slider('Outer 테스트 회차',5,40,12,key='nested_tests')
+            if st.button('🧪 Nested 검증 실행',use_container_width=True):
+                with st.spinner('검증 중...'): bt=nested_walk_forward(df,start_train=360,max_tests=nt,inner_draws=16,sample_combos=1000,random_reps=60)
+                render_backtest_summary(summarize_backtest(bt)); st.dataframe(bt,use_container_width=True,hide_index=True)
+        elif st.button('🏁 전략 토너먼트 실행',use_container_width=True):
             with st.spinner('전략 비교 중...'): tour=strategy_tournament(df,start_train=300,max_tests=30,sample_combos=1400)
             st.dataframe(tour,use_container_width=True,hide_index=True)
-with tabs[7]:
-    c1,c2=st.columns(2)
+    with btabs[2]:
+        if status.get('has_prize_data'):
+            st.info('실제 과거 등위별 당첨금을 이용한 연구용 백테스트입니다. 미래 수익을 보장하지 않습니다.')
+            if st.button('💰 ROI 백테스트 실행',use_container_width=True):
+                with st.spinner('계산 중...'): bt=walk_forward(df,start_train=300,max_tests=50,sample_combos=1800,random_reps=80)
+                render_backtest_summary(summarize_backtest(bt))
+        else: st.warning('현재 데이터에 등위별 당첨금 필드가 없습니다.')
+        probs=theoretical_single_game(); labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등'}; st.dataframe(pd.DataFrame([{'등위':labels[k],'확률':pct(v,6),'약 1 / N':f"1 / {round(1/v):,}"} for k,v in probs.items()]),use_container_width=True,hide_index=True)
+with tabs[4]:
+    st.subheader('AI 진단 · 시간순 검증'); c1,c2=st.columns(2)
     if c1.button('시간순 Holdout',use_container_width=True):
         r=train_evaluate(df)
-        if r.get('available'):
-            c=st.columns(3); c[0].metric('AUC',f"{r['roc_auc_out_of_sample']:.3f}"); c[1].metric('Model Log-loss',f"{r['log_loss_out_of_sample']:.4f}"); c[2].metric('기본보다 우수','예' if r['beats_constant_logloss'] else '아니오')
+        if r.get('available'): c=st.columns(3); c[0].metric('AUC',f"{r['roc_auc_out_of_sample']:.3f}"); c[1].metric('Model Log-loss',f"{r['log_loss_out_of_sample']:.4f}"); c[2].metric('기본보다 우수','예' if r['beats_constant_logloss'] else '아니오')
     if c2.button('완전 Walk-forward',use_container_width=True):
         with st.spinner('회차별 재학습 중...'): r=walk_forward_ml(df,start_train=300,max_tests=30)
-        if r.get('available'):
-            rows=r.pop('rows',[]); c=st.columns(3); c[0].metric('테스트',r['tests']); c[1].metric('평균 AUC',f"{r['mean_auc']:.3f}"); c[2].metric('평균 Top6 적중',f"{r['mean_top6_hits']:.2f}개"); st.caption(f"평균 Log-loss {r['mean_log_loss']:.4f} · 기본 {r['mean_baseline_log_loss']:.4f}")
-with tabs[8]:
-    if status.get('has_prize_data'):
-        st.info('실제 과거 등위별 당첨금을 이용한 연구용 백테스트입니다. 미래 수익을 보장하지 않습니다.')
-        if st.button('💰 ROI 백테스트 실행',use_container_width=True):
-            with st.spinner('계산 중...'): bt=walk_forward(df,start_train=300,max_tests=50,sample_combos=1800,random_reps=80)
-            render_backtest_summary(summarize_backtest(bt))
-    else: st.warning('현재 데이터에 등위별 당첨금 필드가 없습니다.')
-    probs=theoretical_single_game(); labels={'1st':'1등','2nd':'2등','3rd':'3등','4th':'4등','5th':'5등'}; st.dataframe(pd.DataFrame([{'등위':labels[k],'확률':pct(v,6),'약 1 / N':f"1 / {round(1/v):,}"} for k,v in probs.items()]),use_container_width=True,hide_index=True)
-with tabs[9]:
-    st.markdown('''**권장 사용 순서**\n1. 상단의 데이터 정상 표시 확인\n2. 번호 분석과 Pair/Triple로 과거 상태 확인\n3. 백테스트·고급 검증·AI 진단으로 랜덤 기준선과 비교\n4. 마지막에 추천 조합 생성 및 시뮬레이션\n\n**중요**\n- 모든 특정 6개 조합의 1등 확률은 같습니다.\n- Hot/Cold, Gap, Pair, Triple은 과거 통계일 뿐 미래를 보장하지 않습니다.\n- MD Score는 당첨확률이 아닙니다.''')
-    st.caption('MD LOTTO 6/45 · Visual Final UI')
+        if r.get('available'): rows=r.pop('rows',[]); c=st.columns(3); c[0].metric('테스트',r['tests']); c[1].metric('평균 AUC',f"{r['mean_auc']:.3f}"); c[2].metric('평균 Top6 적중',f"{r['mean_top6_hits']:.2f}개"); st.caption(f"평균 Log-loss {r['mean_log_loss']:.4f} · 기본 {r['mean_baseline_log_loss']:.4f}")
+    st.markdown('---'); st.markdown('**사용 원칙**\n- AI가 기본 확률보다 실제로 좋아지는지 검증하는 연구 기능입니다.\n- 결과가 좋지 않으면 AI 예측 신호로 사용하지 않습니다.\n- MD Score는 당첨확률이 아닙니다.')
+st.caption('MD LOTTO 6/45 · Mobile Premium Final UI · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

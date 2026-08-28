@@ -1,4 +1,4 @@
-# MD LOTTO 6/45 <span class="md-ball-version">BALL UI v4</span> v3.1 MOBILE WEB — two-file deployment edition
+# MD LOTTO 6/45 v3.1 MOBILE WEB — two-file deployment edition
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -30,6 +30,13 @@ from md_lotto.simulation import monte_carlo,theoretical_single_game
 from md_lotto.ml import train_evaluate,walk_forward_ml
 
 st.set_page_config(page_title='MD LOTTO 6/45', page_icon='🎯', layout='wide', initial_sidebar_state='collapsed')
+
+st.markdown(
+    '<div style="position:fixed;top:66px;right:10px;z-index:99999;background:#FFD400;color:#111;'
+    'padding:5px 9px;border-radius:999px;font-size:11px;font-weight:1000;box-shadow:0 2px 8px #0008">'
+    'BUILD 2026-08-29 · INLINE BALLS</div>',
+    unsafe_allow_html=True
+)
 ROOT=Path(__file__).parent
 DATA_DIR=Path(os.getenv('MD_LOTTO_DATA_DIR', str(ROOT/'data')))
 DATA_DIR.mkdir(parents=True,exist_ok=True)
@@ -40,6 +47,7 @@ _SYNC_LOCK=threading.Lock()
 
 st.markdown(r"""
 <style>
+/* BUILD 2026-08-29 INLINE BALLS */
 :root{--bg:#050814;--panel:#0a1020;--line:#1d2b46;--muted:#98a4b8;--blue:#1687ff;--green:#28d06f;--red:#ff4f6d;--violet:#9c5cff;--gold:#ffcc33}
 html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif}
 .stApp{background:radial-gradient(circle at 15% 0%,rgba(22,135,255,.12),transparent 28%),radial-gradient(circle at 88% 15%,rgba(156,92,255,.10),transparent 26%),linear-gradient(180deg,#050814 0%,#070b15 100%);color:#f5f7fb}
@@ -62,44 +70,48 @@ html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-
 .game-card{padding:.72rem;border:1px solid #22314c;border-radius:16px;margin:.55rem 0;background:linear-gradient(145deg,#0c1423,#080f1a);box-shadow:0 10px 24px rgba(0,0,0,.19)}.game-title{font-weight:900;margin-bottom:.2rem;color:#dfe7f3}.md-score{color:#ff617f}.small-note{font-size:.78rem;color:#8490a3}.game-card .lotto-row{margin:.4rem 0 .55rem;padding-bottom:.55rem}
 @media(max-width:768px){.block-container{padding-left:.66rem;padding-right:.66rem;padding-top:.3rem;padding-bottom:6.5rem}.hero-shell{padding:1rem .9rem;border-radius:21px}.brand-target{width:48px;height:48px;font-size:1.65rem}.brand-title{font-size:1.72rem}.brand-sub{font-size:.82rem}.section-title{font-size:1.12rem}.date-chip{font-size:.72rem}.lotto-row{gap:.38rem;flex-wrap:nowrap}.ball{width:53px;height:53px;flex-basis:53px}.ball-num{width:74%;height:74%;font-size:1.60rem;-webkit-text-stroke:1.15px rgba(3,6,12,.94)}.bonus{width:59px;height:59px;flex-basis:59px}.bonus .ball-num{font-size:1.72rem}.bonus-label{font-size:1.55rem}.legend{gap:.55rem;font-size:.67rem;padding:.48rem .52rem}.dot{width:9px;height:9px}.kpi-grid{gap:.45rem}.kpi{min-height:101px;padding:.72rem .62rem}.kpi-label{font-size:.72rem}.kpi-value{font-size:1.48rem}.kpi-sub{font-size:.65rem}.menu-grid{gap:.4rem}.menu-card{padding:.64rem .35rem}.menu-icon{font-size:1.35rem}.menu-name{font-size:.82rem}.menu-desc{font-size:.60rem}.game-card .ball{width:43px;height:43px;flex-basis:43px}.game-card .ball-num{font-size:1.31rem}.game-card .lotto-row{gap:.25rem;flex-wrap:nowrap}.game-title{font-size:.9rem}[data-testid="stMetric"]{padding:.6rem!important}h2{font-size:1.25rem!important}h3{font-size:1.06rem!important}div[data-testid="stDataFrame"]{font-size:.76rem}}
 @media(max-width:390px){.ball{width:50px;height:50px;flex-basis:50px}.ball-num{font-size:1.52rem}.lotto-row{gap:.29rem}.bonus{width:56px;height:56px;flex-basis:56px}.bonus .ball-num{font-size:1.64rem}.kpi-value{font-size:1.36rem}.game-card .ball{width:40px;height:40px;flex-basis:40px}.game-card .ball-num{font-size:1.21rem}}
-
-/* ===== MD LOTTO MOBILE BALL UI v4 - FINAL OVERRIDE ===== */
-.ball.b1{background:
-radial-gradient(ellipse at 28% 17%,rgba(255,255,255,1) 0 6%,rgba(255,255,255,.72) 7% 13%,transparent 25%),
-radial-gradient(circle at 33% 29%,#FFFF66 0 17%,#FFD500 37%,#FFB000 61%,#E17700 81%,#7A3400 100%)!important;border:2px solid #FFF18A!important}
-.ball.b2{background:
-radial-gradient(ellipse at 28% 17%,rgba(255,255,255,1) 0 6%,rgba(255,255,255,.70) 7% 13%,transparent 25%),
-radial-gradient(circle at 33% 29%,#62C7FF 0 17%,#007BFF 38%,#0050E6 62%,#0030A8 82%,#00134F 100%)!important;border:2px solid #65C9FF!important}
-.ball.b3{background:
-radial-gradient(ellipse at 28% 17%,rgba(255,255,255,1) 0 6%,rgba(255,255,255,.70) 7% 13%,transparent 25%),
-radial-gradient(circle at 33% 29%,#FF7A7A 0 17%,#FF1010 38%,#E00000 62%,#A00000 82%,#520000 100%)!important;border:2px solid #FF7979!important}
-.ball.b4{background:
-radial-gradient(ellipse at 28% 17%,rgba(255,255,255,1) 0 6%,rgba(255,255,255,.76) 7% 13%,transparent 25%),
-radial-gradient(circle at 33% 29%,#FFFFFF 0 17%,#E2E5E9 35%,#A9B0B8 58%,#707981 80%,#30363C 100%)!important;border:2px solid #FFFFFF!important}
-.ball.b5{background:
-radial-gradient(ellipse at 28% 17%,rgba(255,255,255,1) 0 6%,rgba(255,255,255,.70) 7% 13%,transparent 25%),
-radial-gradient(circle at 33% 29%,#73FF91 0 17%,#00E642 38%,#00B832 62%,#007D24 82%,#003C10 100%)!important;border:2px solid #70FF95!important}
-
-.ball.b1,.ball.b2,.ball.b3,.ball.b4,.ball.b5{
-box-shadow:inset 10px 12px 15px rgba(255,255,255,.48),inset -14px -17px 22px rgba(0,0,0,.58),inset 0 0 0 3px rgba(255,255,255,.13),0 12px 18px rgba(0,0,0,.58)!important;
-filter:saturate(1.45) contrast(1.10)!important}
-.ball.b1::before,.ball.b2::before,.ball.b3::before,.ball.b4::before,.ball.b5::before{
-content:""!important;position:absolute!important;left:10%!important;top:7%!important;width:48%!important;height:23%!important;border-radius:50%!important;
-background:linear-gradient(170deg,#fff 0%,rgba(255,255,255,.95) 32%,rgba(255,255,255,.18) 70%,transparent 100%)!important;
-transform:rotate(-23deg)!important;opacity:1!important;z-index:5!important}
-.ball.b1::after,.ball.b2::after,.ball.b3::after,.ball.b4::after,.ball.b5::after{
-content:""!important;position:absolute!important;left:14%!important;right:14%!important;bottom:-10px!important;height:11px!important;border-radius:50%!important;
-background:radial-gradient(ellipse,rgba(0,0,0,.72) 0%,rgba(0,0,0,.34) 48%,transparent 77%)!important;filter:blur(4px)!important;z-index:-1!important}
-.ball-num{background:transparent!important;box-shadow:none!important;color:#fff!important;-webkit-text-stroke:1.6px #080B10!important;text-shadow:0 3px 2px rgba(0,0,0,.92),0 0 5px rgba(0,0,0,.75)!important}
-.md-ball-version{display:inline-block;margin-left:.4rem;padding:.12rem .4rem;border-radius:999px;background:#ffd400;color:#111;font-size:.72rem;font-weight:1000;vertical-align:middle}
 </style>
 """,unsafe_allow_html=True)
 
 def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
 def balls_html(nums,bonus=None):
-    parts=[f'<span class="ball {ball_class(int(n))}"><span class="ball-num">{int(n)}</span></span>' for n in nums]
-    if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
+    palette={
+        1:("linear-gradient(145deg,#fff78a 0%,#ffd400 25%,#ffae00 55%,#d36b00 78%,#713000 100%)","#fff18a"),
+        2:("linear-gradient(145deg,#76d0ff 0%,#0075ff 27%,#004ed9 57%,#002c9c 80%,#00134d 100%)","#70cfff"),
+        3:("linear-gradient(145deg,#ff8585 0%,#ff1010 27%,#df0000 57%,#9d0000 80%,#4d0000 100%)","#ff7c7c"),
+        4:("linear-gradient(145deg,#ffffff 0%,#e2e6ea 25%,#aab1b9 55%,#717a84 78%,#343a41 100%)","#ffffff"),
+        5:("linear-gradient(145deg,#8cff9b 0%,#00dc41 27%,#00ad32 57%,#007821 80%,#003a10 100%)","#78ff98"),
+    }
+    def render_one(v,is_bonus=False):
+        n=int(v)
+        cls=ball_class(n)
+        k=1 if n<=10 else 2 if n<=20 else 3 if n<=30 else 4 if n<=40 else 5
+        bg,border=palette[k]
+        ring="0 0 0 3px #ffd000,0 0 0 6px rgba(255,208,0,.32)," if is_bonus else ""
+        size="76px" if is_bonus else "70px"
+        style=(
+            f"position:relative;width:{size};height:{size};flex:0 0 {size};border-radius:50%;"
+            f"display:inline-flex;align-items:center;justify-content:center;"
+            f"background:{bg}!important;border:2px solid {border}!important;"
+            f"box-shadow:{ring}inset 12px 13px 18px rgba(255,255,255,.48),"
+            f"inset -15px -18px 23px rgba(0,0,0,.58),0 13px 20px rgba(0,0,0,.58)!important;"
+            f"filter:saturate(1.5) contrast(1.12)!important;overflow:hidden;"
+        )
+        hi=(
+            "position:absolute;left:10%;top:7%;width:48%;height:24%;border-radius:50%;"
+            "background:linear-gradient(170deg,#fff 0%,rgba(255,255,255,.96) 32%,"
+            "rgba(255,255,255,.20) 70%,transparent 100%);transform:rotate(-23deg);z-index:5;"
+        )
+        num=(
+            "position:relative;z-index:6;color:#fff;font-weight:1000;font-size:2.05rem;line-height:1;"
+            "-webkit-text-stroke:1.6px #07090d;text-shadow:0 3px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.75);"
+        )
+        return f'<span class="ball {cls}" style="{style}"><span style="{hi}"></span><span class="ball-num" style="{num}">{n}</span></span>'
+    parts=[render_one(n) for n in nums]
+    if bonus is not None:
+        parts += ['<span class="bonus-label">+</span>',render_one(bonus,True)]
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
+
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
     except:return '-'

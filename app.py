@@ -30,13 +30,6 @@ from md_lotto.simulation import monte_carlo,theoretical_single_game
 from md_lotto.ml import train_evaluate,walk_forward_ml
 
 st.set_page_config(page_title='MD LOTTO 6/45', page_icon='🎯', layout='wide', initial_sidebar_state='collapsed')
-
-st.markdown(
-    '<div style="position:fixed;top:66px;right:10px;z-index:99999;background:#FFD400;color:#111;'
-    'padding:5px 9px;border-radius:999px;font-size:11px;font-weight:1000;box-shadow:0 2px 8px #0008">'
-    'BUILD 2026-08-29 · INLINE BALLS</div>',
-    unsafe_allow_html=True
-)
 ROOT=Path(__file__).parent
 DATA_DIR=Path(os.getenv('MD_LOTTO_DATA_DIR', str(ROOT/'data')))
 DATA_DIR.mkdir(parents=True,exist_ok=True)
@@ -47,7 +40,6 @@ _SYNC_LOCK=threading.Lock()
 
 st.markdown(r"""
 <style>
-/* BUILD 2026-08-29 INLINE BALLS */
 :root{--bg:#050814;--panel:#0a1020;--line:#1d2b46;--muted:#98a4b8;--blue:#1687ff;--green:#28d06f;--red:#ff4f6d;--violet:#9c5cff;--gold:#ffcc33}
 html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif}
 .stApp{background:radial-gradient(circle at 15% 0%,rgba(22,135,255,.12),transparent 28%),radial-gradient(circle at 88% 15%,rgba(156,92,255,.10),transparent 26%),linear-gradient(180deg,#050814 0%,#070b15 100%);color:#f5f7fb}
@@ -58,10 +50,10 @@ html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-
 .brand-title{font-size:clamp(1.8rem,5vw,2.55rem);font-weight:1000;letter-spacing:-.045em;line-height:1;background:linear-gradient(180deg,#fff,#eef1f7 56%,#b8beca);-webkit-background-clip:text;color:transparent;text-shadow:0 8px 20px rgba(0,0,0,.24)}.brand-sub{position:relative;z-index:1;color:#aeb8c9;margin:.65rem 0 0;font-size:.93rem}
 .sync-ok,.sync-warn{display:flex;align-items:center;gap:.75rem;padding:.78rem .92rem;border-radius:16px;margin:.45rem 0 1rem;font-weight:750}.sync-ok{background:linear-gradient(90deg,rgba(18,82,50,.44),rgba(6,27,25,.72));border:1px solid rgba(45,214,112,.38)}.sync-warn{background:linear-gradient(90deg,rgba(104,62,11,.38),rgba(40,26,8,.70));border:1px solid rgba(255,180,55,.38)}.sync-icon{font-size:1.25rem}.sync-main{font-size:1.02rem}.sync-detail{color:#d7deea;font-weight:550}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin:1rem 0 .5rem}.section-title{font-size:1.27rem;font-weight:950}.date-chip{font-size:.83rem;color:#b8dcff;padding:.36rem .62rem;border-radius:10px;background:#0b2242;border:1px solid #174d87}
-.lotto-row{display:flex;gap:.56rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.28rem 0 .9rem;perspective:1000px}.ball{--c1:#ffe06a;--c2:#f1ad00;--c3:#7b4b00;position:relative;width:70px;height:70px;flex:0 0 70px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 18%,#fff 0 5%,rgba(255,255,255,.74) 6%,transparent 18%),radial-gradient(circle at 37% 31%,var(--c1) 0 24%,var(--c2) 58%,var(--c3) 100%);border:1px solid rgba(255,255,255,.78);box-shadow:inset 10px 12px 18px rgba(255,255,255,.34),inset -13px -17px 22px rgba(0,0,0,.45),inset 0 0 0 3px rgba(255,255,255,.10),0 12px 18px rgba(0,0,0,.42)}
-.ball:before{content:"";position:absolute;left:9%;top:7%;width:46%;height:26%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.05));transform:rotate(-27deg);opacity:.92}.ball:after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:12px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(6px);z-index:-1}
+.lotto-row{display:flex;gap:.56rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.28rem 0 .9rem;perspective:1000px}.ball{--c1:#ffe06a;--c2:#f1ad00;--c3:#7b4b00;position:relative;width:70px;height:70px;flex:0 0 70px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 25% 14%,#fff 0 5%,rgba(255,255,255,.96) 6%,rgba(255,255,255,.38) 13%,transparent 25%),radial-gradient(circle at 36% 29%,var(--c1) 0 20%,var(--c2) 55%,var(--c3) 100%);border:1px solid rgba(255,255,255,.78);box-shadow:inset 11px 13px 19px rgba(255,255,255,.42),inset -14px -18px 24px rgba(0,0,0,.48),inset 0 0 0 3px rgba(255,255,255,.14),0 13px 20px rgba(0,0,0,.46)}
+.ball:before{content:"";position:absolute;left:8%;top:6%;width:52%;height:29%;border-radius:50%;background:linear-gradient(175deg,rgba(255,255,255,1) 0%,rgba(255,255,255,.72) 28%,rgba(255,255,255,.12) 75%,rgba(255,255,255,0) 100%);transform:rotate(-25deg);opacity:.98;filter:blur(.15px)}.ball:after{content:"";position:absolute;left:12%;right:12%;bottom:-11px;height:12px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(6px);z-index:-1}
 .ball-num{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:72%;height:72%;border-radius:50%;font-size:2.05rem;font-weight:1000;line-height:1;letter-spacing:-.06em;color:#fff;-webkit-text-stroke:1.45px rgba(3,6,12,.92);text-shadow:0 3px 2px rgba(0,0,0,.85),0 0 5px rgba(0,0,0,.62),0 0 10px rgba(0,0,0,.28);background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.28),rgba(255,255,255,.06) 44%,rgba(0,0,0,.17) 100%);box-shadow:inset 0 1px 3px rgba(255,255,255,.28),inset 0 -3px 5px rgba(0,0,0,.22),0 0 0 1px rgba(255,255,255,.12)}
-.b1{--c1:#ffe46a;--c2:#f2b400;--c3:#835100}.b2{--c1:#78c6ff;--c2:#1687ff;--c3:#063880}.b3{--c1:#ff8f8e;--c2:#ed3547;--c3:#861524}.b4{--c1:#e3e5e8;--c2:#8d929c;--c3:#393f49}.b5{--c1:#8ce88c;--c2:#38b44b;--c3:#145923}.bonus{width:76px;height:76px;flex-basis:76px;box-shadow:inset 10px 12px 18px rgba(255,255,255,.35),inset -14px -18px 23px rgba(0,0,0,.47),0 0 0 3px #ffbd28,0 0 0 6px rgba(255,220,88,.22),0 14px 22px rgba(0,0,0,.48)}.bonus .ball-num{font-size:2.12rem}.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
+.b1{--c1:#FFF36A;--c2:#FFD400;--c3:#B87400}.b2{--c1:#4DB8FF;--c2:#0077FF;--c3:#003EB8}.b3{--c1:#FF5A66;--c2:#FF1638;--c3:#A80018}.b4{--c1:#FFFFFF;--c2:#D9DEE7;--c3:#66707D}.b5{--c1:#59F77B;--c2:#00C853;--c3:#007A31}.bonus{width:76px;height:76px;flex-basis:76px;box-shadow:inset 11px 13px 19px rgba(255,255,255,.43),inset -14px -18px 24px rgba(0,0,0,.49),0 0 0 3px #FFD000,0 0 0 6px rgba(255,208,0,.30),0 14px 23px rgba(0,0,0,.50)}.bonus .ball-num{font-size:2.12rem}.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
 .legend{display:flex;gap:.9rem;flex-wrap:wrap;padding:.55rem .7rem;border-radius:14px;border:1px solid #1b2a43;background:#090f1b;margin:-.15rem 0 1rem;color:#d5dbe5;font-size:.78rem}.legend span{display:flex;align-items:center;gap:.32rem}.dot{width:11px;height:11px;border-radius:50%}
 .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.55rem 0 1rem}.kpi{position:relative;overflow:hidden;border-radius:17px;padding:.82rem .85rem 1rem;border:1px solid #24334e;background:linear-gradient(145deg,#0c1423,#08101c);min-height:112px;box-shadow:0 12px 26px rgba(0,0,0,.22)}.kpi:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(25,132,255,.18),transparent 45%)}.kpi.purple:before{background:radial-gradient(circle at 10% 0%,rgba(158,77,255,.20),transparent 48%)}.kpi.red:before{background:radial-gradient(circle at 10% 0%,rgba(255,65,106,.20),transparent 48%)}.kpi-label{position:relative;color:#c9d2e1;font-size:.82rem;font-weight:750}.kpi-value{position:relative;font-size:1.75rem;font-weight:950;margin-top:.55rem}.kpi-value.redv{color:#ff5c7a}.kpi-sub{position:relative;font-size:.73rem;color:#7f8ba0;margin-top:.12rem}
 .menu-title{font-size:1.15rem;font-weight:950;margin:.5rem 0 .55rem}.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin-bottom:1rem}.menu-card{border:1px solid #243450;border-radius:15px;padding:.75rem .55rem;text-align:center;background:linear-gradient(160deg,#0d1728,#08111f);box-shadow:0 10px 24px rgba(0,0,0,.22)}.menu-card.blue{border-color:#155aa4;background:linear-gradient(160deg,#0c315f,#07182d)}.menu-card.green{border-color:#2e6f31;background:linear-gradient(160deg,#153b18,#08190d)}.menu-card.orange{border-color:#8b5117;background:linear-gradient(160deg,#4b270d,#1b1006)}.menu-card.violet{border-color:#67318b;background:linear-gradient(160deg,#351449,#16091f)}.menu-icon{font-size:1.55rem}.menu-name{font-weight:900;margin-top:.25rem}.menu-desc{font-size:.68rem;color:#bac4d4;margin-top:.15rem}
@@ -75,43 +67,9 @@ html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-
 
 def ball_class(n): return 'b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
 def balls_html(nums,bonus=None):
-    palette={
-        1:("linear-gradient(145deg,#fff78a 0%,#ffd400 25%,#ffae00 55%,#d36b00 78%,#713000 100%)","#fff18a"),
-        2:("linear-gradient(145deg,#76d0ff 0%,#0075ff 27%,#004ed9 57%,#002c9c 80%,#00134d 100%)","#70cfff"),
-        3:("linear-gradient(145deg,#ff8585 0%,#ff1010 27%,#df0000 57%,#9d0000 80%,#4d0000 100%)","#ff7c7c"),
-        4:("linear-gradient(145deg,#ffffff 0%,#e2e6ea 25%,#aab1b9 55%,#717a84 78%,#343a41 100%)","#ffffff"),
-        5:("linear-gradient(145deg,#8cff9b 0%,#00dc41 27%,#00ad32 57%,#007821 80%,#003a10 100%)","#78ff98"),
-    }
-    def render_one(v,is_bonus=False):
-        n=int(v)
-        cls=ball_class(n)
-        k=1 if n<=10 else 2 if n<=20 else 3 if n<=30 else 4 if n<=40 else 5
-        bg,border=palette[k]
-        ring="0 0 0 3px #ffd000,0 0 0 6px rgba(255,208,0,.32)," if is_bonus else ""
-        size="76px" if is_bonus else "70px"
-        style=(
-            f"position:relative;width:{size};height:{size};flex:0 0 {size};border-radius:50%;"
-            f"display:inline-flex;align-items:center;justify-content:center;"
-            f"background:{bg}!important;border:2px solid {border}!important;"
-            f"box-shadow:{ring}inset 12px 13px 18px rgba(255,255,255,.48),"
-            f"inset -15px -18px 23px rgba(0,0,0,.58),0 13px 20px rgba(0,0,0,.58)!important;"
-            f"filter:saturate(1.5) contrast(1.12)!important;overflow:hidden;"
-        )
-        hi=(
-            "position:absolute;left:10%;top:7%;width:48%;height:24%;border-radius:50%;"
-            "background:linear-gradient(170deg,#fff 0%,rgba(255,255,255,.96) 32%,"
-            "rgba(255,255,255,.20) 70%,transparent 100%);transform:rotate(-23deg);z-index:5;"
-        )
-        num=(
-            "position:relative;z-index:6;color:#fff;font-weight:1000;font-size:2.05rem;line-height:1;"
-            "-webkit-text-stroke:1.6px #07090d;text-shadow:0 3px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.75);"
-        )
-        return f'<span class="ball {cls}" style="{style}"><span style="{hi}"></span><span class="ball-num" style="{num}">{n}</span></span>'
-    parts=[render_one(n) for n in nums]
-    if bonus is not None:
-        parts += ['<span class="bonus-label">+</span>',render_one(bonus,True)]
+    parts=[f'<span class="ball {ball_class(int(n))}"><span class="ball-num">{int(n)}</span></span>' for n in nums]
+    if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
-
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
     except:return '-'

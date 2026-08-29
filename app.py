@@ -1,4 +1,4 @@
-# MD LOTTO v3.5 FAST PRIMARY BALLS 6/45 v3.1 MOBILE WEB — two-file deployment edition
+# MD LOTTO v3.6 FAST PRIMARY BALLS 6/45 v3.1 MOBILE WEB — two-file deployment edition
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path

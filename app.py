@@ -1,4 +1,4 @@
-# MD LOTTO v3.6 GLOSSBALL FIX - MOBILE WEB FINAL
+# MD LOTTO v3.7 SAFE BOOT + GLOSSBALL - MOBILE WEB FINAL
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -100,13 +100,21 @@ def cached_mobile_ml_holdout(latest_draw):
 def cached_mobile_ml_walk_forward(latest_draw, tests):
     return walk_forward_ml(load_csv(path),start_train=300,max_tests=tests)
 
-startup_status=cloud_sync_tick(int(time.time()//1800)); st.session_state['startup_sync_status']=startup_status
-if not path.exists(): st.error('데이터 파일을 준비하지 못했습니다. 잠시 뒤 다시 실행해 주세요.'); st.stop()
-df=load_csv(path); status=dataset_status(df); ns=number_stats(df); latest=df.iloc[-1]; ss=st.session_state.get('startup_sync_status') or load_sync_status(sp)
+# SAFE BOOT: render immediately from embedded/validated local history.
+# External sync is manual so a slow/blocked network can never leave the app blank.
+if not path.exists():
+    st.error('내장 데이터 파일을 준비하지 못했습니다. 앱을 다시 배포해 주세요.')
+    st.stop()
+df=load_csv(path)
+status=dataset_status(df)
+ns=number_stats(df)
+latest=df.iloc[-1]
+ss=load_sync_status(sp) or {'ok': True, 'using_cached_data': True, 'safe_boot': True}
+st.session_state.setdefault('startup_sync_status', ss)
 nums=[int(latest[f'n{i}']) for i in range(1,7)]; bonus=int(latest.bonus)
 
-st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45 <span class="v36-badge">v3.6 GLOSSBALL</span></div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
-if ss.get('ok'): st.markdown(f'<div class="sync-ok"><span class="sync-icon">✅</span><span class="sync-main">데이터 정상</span><span class="sync-detail">· 1회 ~ {status.get("max_draw")}회 · 자동 동기화 확인</span></div>',unsafe_allow_html=True)
+st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45 <span class="v36-badge">v3.7 SAFE BOOT</span></div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
+if ss.get('ok'): st.markdown(f'<div class="sync-ok"><span class="sync-icon">✅</span><span class="sync-main">데이터 정상</span><span class="sync-detail">· 1회 ~ {status.get("max_draw")}회 · 검증 데이터 즉시 로드</span></div>',unsafe_allow_html=True)
 else: st.markdown('<div class="sync-warn"><span class="sync-icon">⚠️</span><span class="sync-main">온라인 최신 확인 실패</span><span class="sync-detail">· 마지막 검증 데이터를 사용 중입니다.</span></div>',unsafe_allow_html=True)
 st.markdown(f'<div class="section-head"><div class="section-title">🏆 제 {int(latest.draw_no)}회 최신 당첨번호</div><div class="date-chip">추첨일 {latest.draw_date.strftime("%Y-%m-%d")}</div></div>',unsafe_allow_html=True)
 st.markdown(balls_html(nums,bonus),unsafe_allow_html=True)
@@ -116,7 +124,11 @@ st.markdown('<div class="menu-title">✨ 주요 분석 메뉴</div><div class="m
 
 with st.sidebar:
     st.header('데이터 관리'); st.success(f"최신 {status.get('max_draw')}회까지 확인") if ss.get('ok') else st.warning('온라인 최신 확인 실패'); st.caption('누락 없음' if status.get('complete_from_draw1') else '일부 회차 누락 가능')
-    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True): cloud_sync_tick.clear(); st.session_state['startup_sync_status']=cloud_sync_tick(int(time.time()//1800)); st.rerun()
+    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True):
+        with st.spinner('온라인 최신 데이터를 확인하는 중입니다...'):
+            cloud_sync_tick.clear()
+            st.session_state['startup_sync_status']=cloud_sync_tick(int(time.time()//1800))
+        st.rerun()
     st.caption('동기화 실패 시 기존 검증 데이터는 보존됩니다.')
 if not status['complete_from_draw1']: st.error(f"현재 데이터가 {status['min_draw']}~{status['max_draw']}회만 있습니다.")
 

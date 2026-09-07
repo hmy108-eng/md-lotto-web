@@ -114,19 +114,30 @@ def final_five_board_html(games,target_draw,title='MD LOTTO FINAL 5'):
     )
 
 def _pick_font(size,bold=False):
+    # Cloud-safe font resolver.  The old fallback ImageFont.load_default()
+    # ignored the requested size on some Pillow/Streamlit environments,
+    # which made lotto numbers appear tiny even when the code requested
+    # a large font.  Try Korean/system fonts, then font-name lookup, then
+    # Pillow's scalable default where supported.
     candidates=[
         '/usr/share/fonts/truetype/nanum/NanumSquareB.ttf' if bold else '/usr/share/fonts/truetype/nanum/NanumSquareR.ttf',
         '/usr/share/fonts/truetype/nanum/NanumBarunGothicBold.ttf' if bold else '/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf',
         '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc' if bold else '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
         '/usr/share/fonts/truetype/unfonts-core/UnDotumBold.ttf' if bold else '/usr/share/fonts/truetype/unfonts-core/UnDotum.ttf',
-        '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+        '/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf',
+        'DejaVuSans-Bold.ttf' if bold else 'DejaVuSans.ttf',
+        'LiberationSans-Bold.ttf' if bold else 'LiberationSans-Regular.ttf'
     ]
     for fp in candidates:
         try:
-            return ImageFont.truetype(fp,size=size)
+            return ImageFont.truetype(fp,size=int(size))
         except Exception:
             pass
-    return ImageFont.load_default()
+    try:
+        return ImageFont.load_default(size=int(size))
+    except TypeError:
+        return ImageFont.load_default()
 
 def _ball_rgb(n):
     n=int(n)
@@ -156,8 +167,21 @@ def _draw_signature_ball(d,cx,cy,n,font):
     ir=33
     d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(250,250,248),outline=(221,223,225),width=2)
     d.ellipse((cx-ir+6,cy-ir+5,cx+ir-12,cy-ir+18),fill=(255,255,255))
-    s=str(n); bb=d.textbbox((0,0),s,font=font); tw=bb[2]-bb[0]; th=bb[3]-bb[1]
-    d.text((cx-tw/2,cy-th/2-5),s,font=font,fill=(0,0,0))
+    # Fit the number to the white center disk. Pillow's text bbox includes font
+    # bearings, so center using the bbox itself rather than width/height alone.
+    s=str(n)
+    max_w=int(ir*2*0.94); max_h=int(ir*2*0.90)
+    chosen=font; bb=d.textbbox((0,0),s,font=chosen,stroke_width=1)
+    # Start from a large font and select the largest size that fits the disk.
+    for fs in range(92,23,-1):
+        cand=_pick_font(fs,True)
+        cb=d.textbbox((0,0),s,font=cand,stroke_width=1)
+        if (cb[2]-cb[0])<=max_w and (cb[3]-cb[1])<=max_h:
+            chosen,bb=cand,cb
+            break
+    x=cx-(bb[0]+bb[2])/2
+    y=cy-(bb[1]+bb[3])/2
+    d.text((x,y),s,font=chosen,fill=(0,0,0),stroke_width=1,stroke_fill=(0,0,0))
 
 
 def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):

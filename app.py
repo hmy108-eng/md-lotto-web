@@ -1,4 +1,4 @@
-# MD LOTTO v7.6 TEMPLATE LOCKED - EXACT SIGNATURE GOLD
+# MD LOTTO v7.6 TEMPLATE LOCKED - FINAL WHITE-CENTER BALL TEMPLATE
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -200,53 +200,20 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None)
             date_txt=str(draw_date)
         d.text((1165,167),date_txt,font=f_date,fill=(9,41,174),anchor='mm')
 
-    # --- 2) Use the actual approved balls as sprites. ---
-    # Crops come directly from the exact template; therefore gloss, rim, shadow and colors
-    # match the user's reference instead of being re-created approximately.
-    sprite_boxes={
-        'b1':(362,238,500,366),   # yellow 3
-        'b2':(550,368,688,496),   # blue 11
-        'b3':(930,238,1068,366),  # red 22
-        'b4':(1115,238,1253,366), # black 31
-        'b5':(1312,238,1450,366), # green 44
-    }
-    sprites={}
-    for key,box in sprite_boxes.items():
-        sp=base.crop(box).convert('RGBA')
-        sw,sh=sp.size
-        mask=Image.new('L',(sw,sh),0)
-        md=ImageDraw.Draw(mask)
-        # Oversized body mask intentionally covers every pixel of the original sample ball,
-        # while keeping the surrounding approved row artwork untouched.
-        md.ellipse((1,-3,sw-1,sh-17),fill=255)
-        md.ellipse((22,sh-34,sw-22,sh-1),fill=230)
-        try:
-            from PIL import ImageFilter
-            mask=mask.filter(ImageFilter.GaussianBlur(.6))
-        except Exception:
-            pass
-        sp.putalpha(mask)
-        sprites[key]=sp
-
+    # --- 2) FINAL LOCKED LOTTO BALL TEMPLATE ---
+    # Draw every dynamic ball from one renderer instead of cropping sample balls from
+    # the background template. This prevents old sample colors/numbers from leaking
+    # through and guarantees the approved white-center + colored 3D rim design.
     centers_x=[428,618,808,998,1188,1378]
     centers_y=[300,430,560,690,820]
     f_num=_pick_font(47,True)
     for g,cy in zip(games,centers_y):
         for cx,n in zip(centers_x,g):
             n=int(n)
-            key='b1' if n<=10 else 'b2' if n<=20 else 'b3' if n<=30 else 'b4' if n<=40 else 'b5'
-            sp=sprites[key]
-            px=int(cx-sp.width/2); py=int(cy-sp.height/2)
-            # Neutralize the original sample sphere first.  This prevents any previous template
-            # color (e.g. the reference image's red 14) from peeking around a differently-colored
-            # replacement ball while leaving the row frame and labels untouched.
-            d.ellipse((cx-60,cy-60,cx+60,cy+60),fill=(242,244,247))
-            base.paste(sp,(px,py),sp)
-            # White center disc and bold black number: same approved look, larger and optically centered.
-            ir=36
-            d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(249,249,247),outline=(213,216,219),width=2)
-            d.ellipse((cx-ir+8,cy-ir+5,cx+ir-14,cy-ir+19),fill=(255,255,255))
-            d.text((cx,cy+1),str(n),font=f_num,fill=(0,0,0),anchor='mm')
+            # Completely cover the sample ball embedded in the static board first.
+            # Keep the surrounding row frame/label untouched.
+            d.ellipse((cx-67,cy-67,cx+67,cy+73),fill=(242,244,247))
+            _draw_signature_ball(d,cx,cy,n,f_num)
 
     out=BytesIO(); base.save(out,format='PNG',optimize=True)
     return out.getvalue()

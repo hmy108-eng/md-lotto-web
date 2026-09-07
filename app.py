@@ -1,4 +1,4 @@
-# MD LOTTO v7.1 OFFICIAL BALL EDITION - PREMIUM
+# MD LOTTO v7.3 CLEAN PREMIUM - APPROVED WHITE-CENTER BALL BOARD
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -59,374 +59,230 @@ _SYNC_LOCK=threading.Lock()
 
 st.markdown(r"""
 <style>
-:root{--bg:#050814;--panel:#0a1020;--line:#1d2b46;--muted:#98a4b8;--blue:#1687ff;--green:#28d06f;--red:#ff4f6d;--violet:#9c5cff;--gold:#ffcc33}
-html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif}
-.stApp{background:radial-gradient(circle at 15% 0%,rgba(22,135,255,.12),transparent 28%),radial-gradient(circle at 88% 15%,rgba(156,92,255,.10),transparent 26%),linear-gradient(180deg,#050814 0%,#070b15 100%);color:#f5f7fb}
-.block-container{max-width:1120px;padding-top:.45rem;padding-bottom:6.2rem}[data-testid="stHeader"]{background:transparent}#MainMenu,footer{visibility:hidden}
-.hero-shell{position:relative;overflow:hidden;padding:1.2rem 1.25rem 1.05rem;border-radius:24px;background:linear-gradient(135deg,rgba(29,12,28,.96),rgba(7,14,31,.96));border:1px solid #263556;box-shadow:0 18px 42px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);margin:.2rem 0 1rem}
-.hero-shell:before{content:"";position:absolute;inset:-40% 35% 35% -20%;background:radial-gradient(circle,rgba(255,60,110,.22),transparent 60%);pointer-events:none}.brand-row{display:flex;align-items:center;gap:.75rem;position:relative;z-index:1}
-.brand-target{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:2rem;background:radial-gradient(circle,#fff 0 12%,#e53b49 13% 27%,#fff 28% 40%,#c80f21 41% 59%,#650713 60% 100%);box-shadow:0 7px 20px rgba(255,50,80,.32),inset 0 0 0 2px rgba(255,255,255,.55)}
-.brand-title{font-size:clamp(1.8rem,5vw,2.55rem);font-weight:1000;letter-spacing:-.045em;line-height:1;background:linear-gradient(180deg,#fff,#eef1f7 56%,#b8beca);-webkit-background-clip:text;color:transparent;text-shadow:0 8px 20px rgba(0,0,0,.24)}.brand-sub{position:relative;z-index:1;color:#aeb8c9;margin:.65rem 0 0;font-size:.93rem}
-.sync-ok,.sync-warn{display:flex;align-items:center;gap:1rem;padding:1rem 1.15rem;border-radius:18px;margin:.55rem 0 1.15rem;font-weight:800}.sync-ok{background:linear-gradient(90deg,rgba(18,82,50,.44),rgba(6,27,25,.72));border:1px solid rgba(45,214,112,.38)}.sync-warn{background:linear-gradient(90deg,rgba(104,62,11,.38),rgba(40,26,8,.70));border:1px solid rgba(255,180,55,.38)}.sync-icon{font-size:1.6rem}.sync-main{font-size:1.28rem}.sync-detail{color:#d7deea;font-weight:650;font-size:1.12rem}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:1.15rem 0 .65rem}.section-title{font-size:1.52rem;font-weight:950}.date-chip{font-size:1rem;color:#b8dcff;padding:.48rem .78rem;border-radius:12px;background:#0b2242;border:1px solid #174d87}
-.lotto-row{display:flex;gap:.62rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.34rem 0 .9rem;perspective:1000px}
-.ball{
- --c1:#FFE65C;--c2:#FFC400;--c3:#9B6400;
- position:relative;width:72px;height:72px;flex:0 0 72px;border-radius:50%;
- display:inline-flex;align-items:center;justify-content:center;
- background:
-   radial-gradient(ellipse at 29% 17%,rgba(255,255,255,.98) 0 5%,rgba(255,255,255,.68) 6% 12%,rgba(255,255,255,.14) 16%,transparent 29%),
-   radial-gradient(circle at 35% 31%,var(--c1) 0 18%,var(--c2) 49%,var(--c3) 100%);
- border:2px solid rgba(255,255,255,.88);
- box-shadow:
-   inset 10px 12px 17px rgba(255,255,255,.35),
-   inset -14px -18px 22px rgba(0,0,0,.46),
-   0 12px 18px rgba(0,0,0,.52);
- filter:saturate(1.25) contrast(1.08)
-}
-.ball:before{
- content:"";position:absolute;left:10%;top:7%;width:46%;height:21%;border-radius:50%;
- background:linear-gradient(165deg,rgba(255,255,255,1),rgba(255,255,255,.74) 38%,rgba(255,255,255,.10) 76%,transparent);
- transform:rotate(-22deg);z-index:4;pointer-events:none
-}
-.ball:after{
- content:"";position:absolute;left:14%;right:14%;bottom:-10px;height:12px;border-radius:50%;
- background:radial-gradient(ellipse,rgba(0,0,0,.64),rgba(0,0,0,.22) 52%,transparent 78%);
- filter:blur(4px);z-index:-1;pointer-events:none
-}
-.ball-num{
- position:relative;z-index:6;display:flex;align-items:center;justify-content:center;
- width:67%;height:67%;border-radius:50%;
- font-size:2rem;font-weight:1000;line-height:1;letter-spacing:-.065em;
- color:#050505!important;-webkit-text-stroke:0!important;
- text-shadow:0 1px 0 rgba(255,255,255,.55)!important;
- background:
-   radial-gradient(circle at 34% 27%,#ffffff 0 22%,#f7f7f7 48%,#e4e7ea 78%,#c9ced4 100%);
- border:1px solid rgba(255,255,255,.90);
- box-shadow:
-   inset 4px 5px 7px rgba(255,255,255,.92),
-   inset -5px -7px 9px rgba(0,0,0,.15),
-   0 1px 4px rgba(0,0,0,.24)
-}
-/* Official Lotto 6/45 number-range colors */
-.b1{--c1:#FFE86A;--c2:#FFD000;--c3:#A46C00} /* 1~10 yellow */
-.b2{--c1:#60C5FF;--c2:#1687F8;--c3:#004EAC} /* 11~20 blue */
-.b3{--c1:#FF7777;--c2:#F3262E;--c3:#9B0008} /* 21~30 red */
-.b4{--c1:#AEB5BE;--c2:#4C535C;--c3:#11151A} /* 31~40 black/dark gray */
-.b5{--c1:#6DF58A;--c2:#20B956;--c3:#08712A} /* 41~45 green */
-.bonus{
- width:78px;height:78px;flex-basis:78px;
- box-shadow:
-   inset 10px 12px 17px rgba(255,255,255,.35),
-   inset -14px -18px 22px rgba(0,0,0,.46),
-   0 0 0 3px #E8C24B,
-   0 0 0 6px rgba(232,194,75,.18),
-   0 14px 22px rgba(0,0,0,.48)
-}
-.bonus .ball-num{font-size:2.08rem}
-.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
-.legend{display:flex;gap:.9rem;flex-wrap:wrap;padding:.55rem .7rem;border-radius:14px;border:1px solid #1b2a43;background:#090f1b;margin:-.15rem 0 1rem;color:#d5dbe5;font-size:.78rem}.legend span{display:flex;align-items:center;gap:.32rem}.dot{width:11px;height:11px;border-radius:50%}
-.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.65rem 0 1.1rem}.kpi{position:relative;overflow:hidden;border-radius:17px;padding:1rem 1rem 1.08rem;border:1px solid #24334e;background:linear-gradient(145deg,#0c1423,#08101c);min-height:122px;box-shadow:0 12px 26px rgba(0,0,0,.22)}.kpi:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(25,132,255,.18),transparent 45%)}.kpi.purple:before{background:radial-gradient(circle at 10% 0%,rgba(158,77,255,.20),transparent 48%)}.kpi.red:before{background:radial-gradient(circle at 10% 0%,rgba(255,65,106,.20),transparent 48%)}.kpi-label{position:relative;color:#c9d2e1;font-size:1rem;font-weight:800}.kpi-value{position:relative;font-size:2.12rem;font-weight:950;margin-top:.58rem}.kpi-value.redv{color:#ff5c7a}.kpi-sub{position:relative;font-size:.88rem;color:#8f9bb0;margin-top:.18rem}
-.menu-title{font-size:1.38rem;font-weight:950;margin:.7rem 0 .7rem}.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1.15rem}.menu-card{border:1px solid #243450;border-radius:17px;padding:1rem .7rem;text-align:center;background:linear-gradient(160deg,#0d1728,#08111f);box-shadow:0 10px 24px rgba(0,0,0,.22);min-height:132px}.menu-card.blue{border-color:#155aa4;background:linear-gradient(160deg,#0c315f,#07182d)}.menu-card.green{border-color:#2e6f31;background:linear-gradient(160deg,#153b18,#08190d)}.menu-card.orange{border-color:#8b5117;background:linear-gradient(160deg,#4b270d,#1b1006)}.menu-card.violet{border-color:#67318b;background:linear-gradient(160deg,#351449,#16091f)}.menu-icon{font-size:2.05rem}.menu-name{font-size:1.18rem;font-weight:950;margin-top:.38rem}.menu-desc{font-size:.86rem;color:#c1cad8;margin-top:.24rem}
-[data-testid="stMetric"]{border:1px solid #24334e!important;border-radius:15px!important;background:linear-gradient(145deg,#0c1423,#08101c)!important;padding:.75rem!important;box-shadow:0 10px 22px rgba(0,0,0,.18)}[data-testid="stMetricLabel"]{color:#aeb8c8}[data-testid="stMetricValue"]{color:#f7f9fc}.stButton>button{border-radius:12px!important;font-weight:800!important;border:1px solid #2b4772!important;background:linear-gradient(180deg,#123f73,#0b284b)!important;color:#fff!important;min-height:2.7rem}.stButton>button:hover{border-color:#41a1ff!important;box-shadow:0 8px 20px rgba(15,115,220,.22)!important}
-[data-baseweb="tab-list"]{gap:.32rem;background:#070d17;border:1px solid #1c2940;padding:.42rem;border-radius:14px;overflow-x:auto}button[data-baseweb="tab"]{height:3.25rem;border-radius:11px;padding:0 1rem;color:#a6b0c0;font-weight:850;font-size:1.02rem;white-space:nowrap}button[data-baseweb="tab"][aria-selected="true"]{color:#38a9ff;background:linear-gradient(180deg,#102f57,#0a1b34);box-shadow:inset 0 0 0 1px #235e99}
-.game-card{padding:.72rem;border:1px solid #22314c;border-radius:16px;margin:.55rem 0;background:linear-gradient(145deg,#0c1423,#080f1a);box-shadow:0 10px 24px rgba(0,0,0,.19)}.game-title{font-weight:900;margin-bottom:.2rem;color:#dfe7f3}.md-score{color:#ff617f}.small-note{font-size:.78rem;color:#8490a3}.game-card .lotto-row{margin:.4rem 0 .55rem;padding-bottom:.55rem}
-@media(max-width:768px){.sync-ok,.sync-warn{padding:.95rem .9rem;gap:.72rem}.sync-icon{font-size:1.45rem}.sync-main{font-size:1.13rem}.sync-detail{font-size:.98rem}.section-title{font-size:1.30rem}.date-chip{font-size:.88rem;padding:.45rem .62rem}.kpi{padding:.85rem .75rem;min-height:112px}.kpi-label{font-size:.9rem}.kpi-value{font-size:1.82rem}.kpi-sub{font-size:.78rem}.menu-title{font-size:1.28rem}.menu-card{padding:.85rem .45rem;min-height:116px}.menu-icon{font-size:1.82rem}.menu-name{font-size:1.02rem}.menu-desc{font-size:.76rem}button[data-baseweb="tab"]{height:3rem;font-size:.94rem;padding:0 .78rem}.block-container{padding-left:.66rem;padding-right:.66rem;padding-top:.3rem;padding-bottom:6.5rem}.hero-shell{padding:1rem .9rem;border-radius:21px}.brand-target{width:48px;height:48px;font-size:1.65rem}.brand-title{font-size:1.72rem}.brand-sub{font-size:.82rem}.section-title{font-size:1.12rem}.date-chip{font-size:.72rem}.lotto-row{gap:.38rem;flex-wrap:nowrap}.ball{width:53px;height:53px;flex-basis:53px}.ball-num{width:74%;height:74%;font-size:1.60rem;-webkit-text-stroke:1.15px rgba(3,6,12,.94)}.bonus{width:59px;height:59px;flex-basis:59px}.bonus .ball-num{font-size:1.72rem}.bonus-label{font-size:1.55rem}.legend{gap:.55rem;font-size:.67rem;padding:.48rem .52rem}.dot{width:9px;height:9px}.kpi-grid{gap:.45rem}.kpi{min-height:101px;padding:.72rem .62rem}.kpi-label{font-size:.72rem}.kpi-value{font-size:1.48rem}.kpi-sub{font-size:.65rem}.menu-grid{gap:.4rem}.menu-card{padding:.64rem .35rem}.menu-icon{font-size:1.35rem}.menu-name{font-size:.82rem}.menu-desc{font-size:.60rem}.game-card .ball{width:43px;height:43px;flex-basis:43px}.game-card .ball-num{font-size:1.31rem}.game-card .lotto-row{gap:.25rem;flex-wrap:nowrap}.game-title{font-size:.9rem}[data-testid="stMetric"]{padding:.6rem!important}h2{font-size:1.25rem!important}h3{font-size:1.06rem!important}div[data-testid="stDataFrame"]{font-size:.76rem}}
-@media(max-width:390px){.ball{width:50px;height:50px;flex-basis:50px}.ball-num{font-size:1.52rem}.lotto-row{gap:.29rem}.bonus{width:56px;height:56px;flex-basis:56px}.bonus .ball-num{font-size:1.64rem}.kpi-value{font-size:1.36rem}.game-card .ball{width:40px;height:40px;flex-basis:40px}.game-card .ball-num{font-size:1.21rem}}
-.v36-badge{display:inline-block;margin-left:.42rem;padding:.14rem .40rem;border-radius:999px;background:#FFD000;color:#111;font-size:.68rem;font-weight:1000;vertical-align:middle}
-
-/* ===== v3.8 MOBILE ONE-ROW FIT + VIVID GLOSSBALL OVERRIDE ===== */
-@media (max-width: 640px){
-  .lotto-row{
-    display:flex!important;
-    flex-wrap:nowrap!important;
-    width:100%!important;
-    max-width:100%!important;
-    gap:4px!important;
-    justify-content:space-between!important;
-    align-items:center!important;
-    overflow:visible!important;
-    padding:.28rem 0 .72rem!important;
-    margin:.45rem 0 .75rem!important;
-  }
-  .lotto-row>.ball{
-    width:calc((100% - 20px)/6)!important;
-    height:auto!important;
-    aspect-ratio:1/1!important;
-    max-width:50px!important;
-    min-width:0!important;
-    flex:0 1 calc((100% - 20px)/6)!important;
-    box-sizing:border-box!important;
-    border-width:2px!important;
-  }
-  .lotto-row>.ball .ball-num{
-    width:76%!important;
-    height:76%!important;
-    font-size:clamp(1.35rem,6.1vw,1.72rem)!important;
-    -webkit-text-stroke:1.25px #06080c!important;
-  }
-  .lotto-row>.bonus{
-    width:calc((100% - 24px)/7)!important;
-    max-width:46px!important;
-    flex-basis:calc((100% - 24px)/7)!important;
-  }
-  .bonus-label{
-    font-size:1.2rem!important;
-    margin:0!important;
-  }
-}
-@media (max-width: 390px){
-  .lotto-row{gap:3px!important}
-  .lotto-row>.ball{
-    width:calc((100% - 15px)/6)!important;
-    max-width:47px!important;
-    flex-basis:calc((100% - 15px)/6)!important;
-  }
-  .lotto-row>.ball .ball-num{
-    font-size:clamp(1.28rem,5.8vw,1.58rem)!important;
-  }
-}
-/* Remove muted filter effects from the balls only */
-.ball.b1,.ball.b2,.ball.b3,.ball.b4,.ball.b5{
-  filter:saturate(1.75) contrast(1.15)!important;
-}
-
-.compact-audit-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin:.45rem 0 .7rem}
-.compact-audit{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.58rem .72rem;border:1px solid #24334e;border-radius:12px;background:#0a111e;min-height:54px}
-.compact-audit span{font-size:.76rem;color:#9ea9ba;font-weight:700}.compact-audit b{font-size:.94rem;color:#f4f7fb;white-space:nowrap}
-@media(max-width:768px){.compact-audit-row{gap:.35rem}.compact-audit{padding:.5rem .48rem;min-height:50px;display:block}.compact-audit span{display:block;font-size:.68rem}.compact-audit b{display:block;font-size:.86rem;margin-top:.16rem}}
-
-/* v6.1 UX layout only */
-.week-flow-title{font-size:1.28rem;font-weight:950;margin:.75rem 0 .55rem}
-.week-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin:0 0 .8rem}
-.week-step{position:relative;border:1px solid #263653;border-radius:15px;padding:.78rem .72rem;background:linear-gradient(155deg,#0c1628,#08101d);min-height:92px}
-.week-step .num{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#17396a;color:#fff;font-size:.76rem;font-weight:900;margin-bottom:.38rem}
-.week-step .name{font-size:.93rem;font-weight:900;color:#f5f7fb}
-.week-step .desc{font-size:.72rem;line-height:1.35;color:#96a4b8;margin-top:.16rem}
-.week-step.active{border-color:#2868bd;background:linear-gradient(155deg,#10274a,#091426)}
-.ops-title{font-size:1.08rem;font-weight:900;margin:.25rem 0 .45rem}
-.ops-note{font-size:.77rem;color:#96a4b8}
-[data-testid="stExpander"]{border-color:#24334e!important;border-radius:14px!important}
-@media(max-width:768px){
-  .week-flow{grid-template-columns:repeat(2,1fr);gap:.42rem}
-  .week-step{min-height:88px;padding:.68rem .62rem}
-  .week-step .name{font-size:.88rem}
-  .week-step .desc{font-size:.69rem}
-}
-
-/* v7.0 OBSIDIAN GLASS — visual redesign */
-:root{--aurora:#70d7ff;--aurora2:#9f7cff;--glass:rgba(12,20,38,.76);--glass2:rgba(18,29,52,.68)}
-.stApp{
- background:
- radial-gradient(circle at 8% 4%,rgba(57,183,255,.18),transparent 24%),
- radial-gradient(circle at 92% 8%,rgba(141,91,255,.16),transparent 26%),
- radial-gradient(circle at 50% 100%,rgba(18,89,165,.13),transparent 30%),
- linear-gradient(155deg,#030711 0%,#07101e 45%,#040812 100%)!important;
-}
-.block-container{max-width:1180px!important;padding-top:.7rem!important}
-.hero-shell{
- border:1px solid rgba(139,205,255,.25)!important;border-radius:28px!important;
- padding:1.55rem 1.6rem 1.3rem!important;
- background:linear-gradient(135deg,rgba(15,31,57,.92),rgba(8,16,32,.88))!important;
- box-shadow:0 22px 60px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.07)!important;
-}
-.brand-title{letter-spacing:-.035em!important}
-.v36-badge{background:linear-gradient(90deg,#5fcaff,#9c7cff)!important;color:#06101d!important;border:none!important;font-weight:950!important}
-[data-testid="stTabs"] [data-baseweb="tab-list"]{
- gap:.38rem;background:rgba(8,16,31,.72);padding:.38rem;border:1px solid rgba(113,166,225,.18);
- border-radius:18px;backdrop-filter:blur(16px)
-}
-[data-testid="stTabs"] button[role="tab"]{
- border-radius:13px!important;padding:.62rem .85rem!important;font-weight:850!important
-}
-[data-testid="stTabs"] button[aria-selected="true"]{
- background:linear-gradient(135deg,rgba(51,156,255,.25),rgba(131,94,255,.23))!important;
- box-shadow:inset 0 0 0 1px rgba(124,196,255,.25)
-}
-div.stButton>button,div.stDownloadButton>button{
- min-height:52px!important;border-radius:15px!important;border:1px solid rgba(125,193,255,.30)!important;
- background:linear-gradient(135deg,#1479df 0%,#4d63dc 55%,#7656cf 100%)!important;
- color:white!important;font-weight:900!important;letter-spacing:-.01em!important;
- box-shadow:0 10px 28px rgba(30,91,190,.25),inset 0 1px rgba(255,255,255,.18)!important;
- transition:transform .18s ease,box-shadow .18s ease!important
-}
-div.stButton>button:hover,div.stDownloadButton>button:hover{
- transform:translateY(-1px);box-shadow:0 14px 34px rgba(42,112,224,.34),inset 0 1px rgba(255,255,255,.22)!important
-}
-[data-testid="stMetric"],.game-card{
- background:linear-gradient(145deg,rgba(15,27,49,.88),rgba(8,15,29,.82))!important;
- border:1px solid rgba(114,169,229,.18)!important;border-radius:18px!important;
- box-shadow:0 12px 30px rgba(0,0,0,.18)!important
-}
-.final-board{
- position:relative;overflow:hidden;margin:.8rem 0 1rem;padding:1.15rem 1.15rem 1rem;border-radius:24px;
- border:1px solid rgba(117,197,255,.26);
- background:linear-gradient(145deg,rgba(16,31,57,.96),rgba(7,14,28,.96));
- box-shadow:0 18px 48px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.07)
-}
-.final-board:before{content:"";position:absolute;inset:-80px auto auto -80px;width:210px;height:210px;border-radius:50%;background:rgba(55,180,255,.11);filter:blur(18px)}
-.final-head{position:relative;display:flex;justify-content:space-between;gap:.7rem;align-items:flex-end;margin-bottom:.85rem}
-.final-kicker{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:#78d5ff}
-.final-title{font-size:1.32rem;font-weight:950;letter-spacing:-.035em;color:#fff}
-.final-draw{font-size:.76rem;color:#9cadc4;border:1px solid #293b58;border-radius:999px;padding:.35rem .6rem}
-.final-grid{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.52rem}
-.final-line{background:rgba(5,12,24,.68);border:1px solid rgba(99,150,208,.18);border-radius:16px;padding:.65rem .45rem .7rem;text-align:center}
-.final-rank{font-size:.72rem;font-weight:900;color:#9eb0c7;margin-bottom:.5rem}
-.final-line .lotto-row{gap:.22rem;justify-content:center;flex-wrap:nowrap}
-.final-line .ball{width:35px;height:35px;min-width:35px}
-.final-line .ball-num{font-size:.82rem}
-.action-strip{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:.45rem 0 .9rem}
-@media(max-width:900px){
- .final-grid{grid-template-columns:1fr}
- .final-line{display:grid;grid-template-columns:54px 1fr;align-items:center;padding:.55rem .6rem}
- .final-rank{margin:0;text-align:left}
- .final-line .lotto-row{justify-content:flex-start;gap:.34rem}
- .final-line .ball{width:39px;height:39px;min-width:39px}
- .action-strip{grid-template-columns:1fr}
-}
-
-/* v7.0 OBSIDIAN COMMAND — radical premium layout */
 :root{
- --ink:#02050b;--panel:#07111f;--panel2:#0a1728;--cyan:#6be2ff;--vio:#9e7dff;
- --gold:#e7c46a;--line:rgba(148,190,236,.20);--muted:#8fa3bc;
+  --bg:#03060c;
+  --panel:#08111f;
+  --panel2:#0c1727;
+  --line:#243654;
+  --line2:#33547d;
+  --text:#f6f8fb;
+  --muted:#91a2b8;
+  --cyan:#79e4ff;
+  --violet:#a78cff;
+  --gold:#e7c56f;
+  --green:#55e39a;
 }
+
+html,body,[class*="css"]{font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
 .stApp{
- background:
- radial-gradient(circle at 50% -15%,rgba(39,121,210,.18),transparent 32%),
- radial-gradient(circle at 92% 12%,rgba(129,82,222,.13),transparent 26%),
- linear-gradient(180deg,#01040a 0%,#050b14 45%,#02050a 100%)!important;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% -8%,rgba(43,132,223,.18),transparent 30%),
+    radial-gradient(circle at 92% 4%,rgba(138,92,224,.14),transparent 28%),
+    linear-gradient(180deg,#02050a 0%,#06101c 42%,#03070d 100%);
 }
-.block-container{max-width:1240px!important;padding-top:.45rem!important;padding-bottom:4rem!important}
+.block-container{max-width:1180px!important;padding:.65rem 1rem 4rem!important}
 #MainMenu,footer,[data-testid="stHeader"]{visibility:hidden!important}
 
-/* premium command header */
+/* ===== COMMAND HEADER ===== */
 .cmd-shell{
- position:relative;overflow:hidden;border-radius:30px;margin:.25rem 0 1rem;padding:1.35rem 1.45rem 1.2rem;
- background:
- linear-gradient(120deg,rgba(13,28,49,.98),rgba(5,12,24,.98) 65%),
- radial-gradient(circle at 90% 10%,rgba(101,75,205,.18),transparent 35%);
- border:1px solid rgba(151,203,255,.24);
- box-shadow:0 28px 70px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.06)
+  position:relative;overflow:hidden;border-radius:30px;padding:1.35rem 1.4rem 1.2rem;margin:.2rem 0 1rem;
+  background:
+    linear-gradient(135deg,rgba(13,29,51,.97),rgba(5,12,24,.98) 72%);
+  border:1px solid rgba(130,196,255,.24);
+  box-shadow:0 28px 70px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.06);
 }
 .cmd-shell:before{
- content:"";position:absolute;inset:auto -80px -120px auto;width:360px;height:360px;border-radius:50%;
- background:radial-gradient(circle,rgba(69,184,255,.12),transparent 68%);filter:blur(8px)
+  content:"";position:absolute;right:-110px;top:-130px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(86,201,255,.13),transparent 67%);
 }
-.cmd-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;z-index:1}
+.cmd-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .cmd-brand{display:flex;align-items:center;gap:1rem}
 .cmd-logo{
- width:66px;height:66px;border-radius:20px;display:grid;place-items:center;font-size:2rem;
- background:linear-gradient(145deg,#102a4d,#08111f);border:1px solid rgba(116,202,255,.28);
- box-shadow:0 14px 30px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.08)
+  width:68px;height:68px;border-radius:21px;display:grid;place-items:center;font-size:2rem;font-weight:1000;
+  color:#dff8ff;background:linear-gradient(145deg,#102b4c,#07111f);
+  border:1px solid rgba(114,205,255,.28);
+  box-shadow:0 15px 32px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.09)
 }
-.cmd-eyebrow{font-size:.72rem;letter-spacing:.18em;color:#70dfff;font-weight:900}
-.cmd-title{font-size:clamp(2rem,5vw,3.15rem);line-height:.95;font-weight:1000;letter-spacing:-.05em;color:#fff}
-.cmd-title span{background:linear-gradient(90deg,#6be2ff,#b392ff);-webkit-background-clip:text;color:transparent}
-.cmd-sub{margin-top:.55rem;color:#95a8c2;font-size:.93rem}
+.cmd-eyebrow{font-size:.7rem;letter-spacing:.18em;color:#74deff;font-weight:900}
+.cmd-title{font-size:clamp(2rem,5vw,3.1rem);line-height:.96;font-weight:1000;letter-spacing:-.055em}
+.cmd-title span{
+  background:linear-gradient(90deg,#76e5ff,#b49aff);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.cmd-sub{margin-top:.52rem;color:#9bacbf;font-size:.9rem}
 .cmd-badge{
- flex:0 0 auto;border-radius:999px;padding:.58rem .9rem;font-weight:900;font-size:.76rem;letter-spacing:.08em;
- color:#06111c;background:linear-gradient(90deg,#71dfff,#d8c5ff);box-shadow:0 8px 24px rgba(91,180,255,.18)
+  flex:0 0 auto;padding:.56rem .82rem;border-radius:999px;font-size:.69rem;font-weight:950;letter-spacing:.08em;
+  color:#08101a;background:linear-gradient(90deg,#7ae3ff,#d1c1ff);
+  box-shadow:0 8px 24px rgba(88,174,240,.18)
 }
-.cmd-status{
- position:relative;z-index:1;display:grid;grid-template-columns:1.45fr 1fr 1fr 1fr;gap:.55rem;margin-top:1rem
-}
+.cmd-status{position:relative;z-index:1;display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:.52rem;margin-top:1rem}
 .cmd-stat{
- border:1px solid rgba(132,181,230,.17);border-radius:17px;padding:.72rem .78rem;
- background:linear-gradient(145deg,rgba(12,27,48,.80),rgba(5,12,23,.82))
+  border:1px solid rgba(129,176,226,.17);border-radius:16px;padding:.7rem .76rem;
+  background:linear-gradient(145deg,rgba(12,28,49,.82),rgba(5,12,23,.84))
 }
-.cmd-stat .lab{font-size:.68rem;color:#7f94ae;font-weight:800;letter-spacing:.04em}
-.cmd-stat .val{font-size:1.03rem;color:#f7f9fc;font-weight:950;margin-top:.16rem}
-.cmd-stat.live{border-color:rgba(66,223,137,.25)}
-.cmd-stat.live .val{color:#62e8a2}
+.cmd-stat .lab{font-size:.64rem;color:#7f93ac;font-weight:850;letter-spacing:.06em}
+.cmd-stat .val{font-size:1rem;font-weight:950;color:#f8faff;margin-top:.18rem}
+.cmd-stat.live{border-color:rgba(81,226,154,.28)}
+.cmd-stat.live .val{color:#65e6a5}
 
-/* latest draw stage */
+/* ===== LATEST DRAW ===== */
 .draw-stage{
- margin:.85rem 0 1rem;border-radius:26px;padding:1rem 1.1rem 1.05rem;
- background:linear-gradient(145deg,rgba(11,22,39,.88),rgba(5,11,21,.90));
- border:1px solid rgba(130,176,224,.18);box-shadow:0 18px 40px rgba(0,0,0,.22)
+  border-radius:26px;padding:1.05rem 1.1rem 1.1rem;margin:.8rem 0 1rem;
+  background:linear-gradient(145deg,rgba(11,23,42,.94),rgba(5,12,23,.96));
+  border:1px solid rgba(131,181,230,.18);
+  box-shadow:0 18px 40px rgba(0,0,0,.23)
 }
-.draw-stage-head{display:flex;align-items:end;justify-content:space-between;gap:.8rem;margin-bottom:.3rem}
-.draw-stage-kicker{font-size:.68rem;font-weight:900;letter-spacing:.13em;color:#78dfff}
-.draw-stage-title{font-size:1.35rem;font-weight:950;color:#fff}
-.draw-stage-date{font-size:.78rem;color:#93a6bf;border:1px solid #273d5b;border-radius:999px;padding:.38rem .62rem}
+.draw-stage-head{display:flex;align-items:flex-end;justify-content:space-between;gap:.8rem;margin-bottom:.35rem}
+.draw-stage-kicker{font-size:.66rem;letter-spacing:.14em;color:#72dcff;font-weight:900}
+.draw-stage-title{font-size:1.4rem;font-weight:1000;letter-spacing:-.03em}
+.draw-stage-date{
+  padding:.4rem .68rem;border-radius:999px;font-size:.8rem;font-weight:850;color:#d7e9ff;
+  background:#0b1d34;border:1px solid #29496e
+}
 
-/* command navigation cards */
-.command-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.75rem 0 1rem}
+/* ===== 3D LOTTO BALLS: exact visual standard ===== */
+.lotto-row{display:flex;align-items:center;gap:.62rem;flex-wrap:wrap;margin:.55rem 0 .85rem;padding:.22rem 0 .45rem}
+.ball{
+  --c1:#FFE969;--c2:#FFD000;--c3:#9A6600;
+  position:relative;width:72px;height:72px;flex:0 0 72px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 28% 15%,rgba(255,255,255,1) 0 5%,rgba(255,255,255,.72) 7% 11%,rgba(255,255,255,.13) 16%,transparent 29%),
+    radial-gradient(circle at 34% 29%,var(--c1) 0 17%,var(--c2) 48%,var(--c3) 100%);
+  border:2px solid rgba(255,255,255,.92);
+  box-shadow:
+    inset 10px 12px 16px rgba(255,255,255,.34),
+    inset -15px -18px 22px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.18),
+    0 12px 19px rgba(0,0,0,.52);
+  filter:saturate(1.26) contrast(1.08);
+}
+.ball:before{
+  content:"";position:absolute;left:9%;top:6%;width:48%;height:22%;border-radius:50%;
+  background:linear-gradient(165deg,#fff,rgba(255,255,255,.80) 37%,rgba(255,255,255,.12) 75%,transparent);
+  transform:rotate(-22deg);z-index:4;pointer-events:none
+}
+.ball:after{
+  content:"";position:absolute;left:13%;right:13%;bottom:-10px;height:12px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.67),rgba(0,0,0,.22) 55%,transparent 78%);
+  filter:blur(4px);z-index:-1
+}
+.ball-num{
+  position:relative;z-index:6;
+  display:flex;align-items:center;justify-content:center;
+  width:62%;height:62%;border-radius:50%;
+  font-size:2.05rem;font-weight:1000;line-height:1;letter-spacing:-.07em;
+  color:#050505!important;
+  -webkit-text-stroke:0!important;
+  text-shadow:0 1px 1px rgba(255,255,255,.44)!important;
+  background:#fff!important;border:2px solid rgba(225,225,222,.96)!important;
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.12)!important
+}
+.b1{--c1:#FFEF76;--c2:#FFD000;--c3:#A56B00}  /* 1~10 yellow */
+.b2{--c1:#6DCCFF;--c2:#1687F8;--c3:#004BA8}  /* 11~20 blue */
+.b3{--c1:#FF8585;--c2:#F3262E;--c3:#970009}  /* 21~30 red */
+.b4{--c1:#AEB4BA;--c2:#555B61;--c3:#171A1E}  /* 31~40 black / dark gray */
+.b5{--c1:#7AF398;--c2:#20B956;--c3:#08702A}  /* 41~45 green */
+.bonus{width:78px;height:78px;flex-basis:78px;box-shadow:
+  inset 10px 12px 16px rgba(255,255,255,.34),
+  inset -15px -18px 22px rgba(0,0,0,.45),
+  0 0 0 3px #E6C25D,0 0 0 6px rgba(230,194,93,.17),0 14px 23px rgba(0,0,0,.48)}
+.bonus .ball-num{font-size:2.08rem}
+.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;text-shadow:0 3px 5px #000}
+
+/* ===== COMMAND FLOW ===== */
+.command-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.62rem;margin:.7rem 0 1rem}
 .command-card{
- border:1px solid rgba(128,178,229,.18);border-radius:21px;padding:.9rem .9rem .85rem;
- background:linear-gradient(150deg,rgba(11,27,49,.86),rgba(5,13,25,.88));
- box-shadow:0 14px 32px rgba(0,0,0,.20)
+  border:1px solid rgba(127,176,226,.17);border-radius:20px;padding:.88rem .9rem .84rem;
+  background:linear-gradient(150deg,rgba(11,27,49,.88),rgba(5,13,25,.90));
+  box-shadow:0 14px 32px rgba(0,0,0,.19)
 }
-.command-card.hot{border-color:rgba(103,217,255,.34);background:linear-gradient(150deg,rgba(14,43,73,.90),rgba(7,17,31,.92))}
-.command-card .no{font-size:.68rem;font-weight:950;color:#70dfff;letter-spacing:.10em}
-.command-card .ttl{font-size:1.03rem;font-weight:950;color:#fff;margin-top:.22rem}
-.command-card .txt{font-size:.75rem;line-height:1.4;color:#879bb4;margin-top:.18rem}
+.command-card.hot{border-color:rgba(109,218,255,.34);background:linear-gradient(150deg,rgba(14,43,73,.92),rgba(7,17,31,.94))}
+.command-card .no{font-size:.65rem;letter-spacing:.11em;color:#70dfff;font-weight:950}
+.command-card .ttl{font-size:1.03rem;font-weight:1000;margin-top:.22rem}
+.command-card .txt{font-size:.74rem;line-height:1.4;color:#8b9fb8;margin-top:.18rem}
 
-/* heavyweight action buttons */
+/* ===== TABS ===== */
+[data-testid="stTabs"] [data-baseweb="tab-list"]{
+  gap:.32rem;padding:.33rem;border-radius:17px;
+  background:rgba(3,9,18,.82);border:1px solid rgba(123,171,222,.15)
+}
+[data-testid="stTabs"] button[role="tab"]{
+  min-height:49px!important;border-radius:12px!important;padding:.55rem .78rem!important;
+  font-size:.92rem!important;font-weight:900!important
+}
+[data-testid="stTabs"] button[aria-selected="true"]{
+  background:linear-gradient(135deg,rgba(45,141,235,.24),rgba(116,82,207,.22))!important;
+  box-shadow:inset 0 0 0 1px rgba(124,197,255,.22)!important
+}
+
+/* ===== BUTTONS ===== */
 div.stButton>button,div.stDownloadButton>button{
- min-height:58px!important;border-radius:17px!important;border:1px solid rgba(136,210,255,.35)!important;
- background:
- linear-gradient(180deg,rgba(255,255,255,.08),transparent 28%),
- linear-gradient(125deg,#0b76d5 0%,#4a62df 54%,#7654c9 100%)!important;
- box-shadow:0 14px 34px rgba(36,94,196,.30),inset 0 1px rgba(255,255,255,.24)!important;
- color:#fff!important;font-size:1rem!important;font-weight:950!important;letter-spacing:-.02em!important
+  min-height:58px!important;border-radius:17px!important;
+  color:#fff!important;font-size:1rem!important;font-weight:950!important;
+  border:1px solid rgba(138,211,255,.34)!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.07),transparent 27%),
+    linear-gradient(125deg,#087bdc 0%,#4b63df 54%,#7656cd 100%)!important;
+  box-shadow:0 14px 34px rgba(35,94,196,.28),inset 0 1px 0 rgba(255,255,255,.24)!important
 }
 div.stButton>button:hover,div.stDownloadButton>button:hover{
- transform:translateY(-2px)!important;
- box-shadow:0 20px 42px rgba(43,115,230,.38),inset 0 1px rgba(255,255,255,.28)!important
+  transform:translateY(-2px)!important;
+  box-shadow:0 20px 44px rgba(43,115,230,.37),inset 0 1px 0 rgba(255,255,255,.28)!important
 }
 
-/* new final5 showcase */
+/* ===== FINAL 5 BOARD ===== */
 .final-board{
- padding:1.25rem!important;border-radius:28px!important;
- background:
- radial-gradient(circle at 8% 0%,rgba(64,185,255,.12),transparent 24%),
- linear-gradient(145deg,#0b1a2e,#050c18)!important;
- border:1px solid rgba(124,199,255,.27)!important;
- box-shadow:0 24px 60px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.06)!important
+  position:relative;overflow:hidden;border-radius:28px;padding:1.2rem;margin:.75rem 0 .9rem;
+  background:
+    radial-gradient(circle at 6% 0%,rgba(63,188,255,.11),transparent 25%),
+    linear-gradient(145deg,#0b1a2f,#050c18);
+  border:1px solid rgba(124,198,255,.27);
+  box-shadow:0 24px 60px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.06)
 }
-.final-kicker{font-size:.72rem!important;letter-spacing:.16em!important;color:#6fe2ff!important}
-.final-title{font-size:1.6rem!important}
-.final-grid{grid-template-columns:1fr!important;gap:.58rem!important}
+.final-head{display:flex;align-items:flex-end;justify-content:space-between;gap:.8rem;margin-bottom:.9rem}
+.final-kicker{font-size:.68rem;letter-spacing:.16em;color:#6fe0ff;font-weight:950}
+.final-title{font-size:1.55rem;font-weight:1000;letter-spacing:-.035em}
+.final-draw{font-size:.83rem;font-weight:900;color:#d2e5ff;border:1px solid #2a486d;border-radius:999px;padding:.42rem .68rem}
+.final-grid{display:grid;grid-template-columns:1fr;gap:.58rem}
 .final-line{
- display:grid!important;grid-template-columns:70px 1fr!important;align-items:center!important;
- text-align:left!important;padding:.68rem .8rem!important;border-radius:18px!important;
- background:linear-gradient(90deg,rgba(13,31,55,.92),rgba(5,13,25,.84))!important;
- border:1px solid rgba(119,173,228,.17)!important
+  display:grid;grid-template-columns:72px 1fr;align-items:center;
+  border:1px solid rgba(120,173,228,.17);border-radius:18px;padding:.68rem .78rem;
+  background:linear-gradient(90deg,rgba(13,31,55,.92),rgba(5,13,25,.84))
 }
-.final-rank{font-size:.92rem!important;color:#78dfff!important;margin:0!important}
-.final-line .lotto-row{justify-content:flex-start!important;gap:.65rem!important;margin:0!important;padding:0!important}
-.final-line .ball{width:60px!important;height:60px!important;min-width:60px!important}
-.final-line .ball-num{font-size:1.38rem!important;font-weight:1000!important;color:#050505!important}
+.final-rank{font-size:.92rem;color:#76dcff;font-weight:1000}
+.final-line .lotto-row{justify-content:flex-start;gap:.68rem;margin:0;padding:0}
+.final-line .ball{width:60px;height:60px;min-width:60px}
+.final-line .ball-num{font-size:1.42rem}
 
-/* cleaner content panels */
-[data-testid="stMetric"]{
- border-radius:18px!important;background:linear-gradient(145deg,rgba(10,24,43,.88),rgba(5,12,23,.90))!important;
- border:1px solid rgba(121,170,221,.16)!important;padding:.65rem!important
+/* ===== MISC PANELS ===== */
+.legend{display:flex;gap:.8rem;flex-wrap:wrap;padding:.58rem .72rem;border-radius:14px;border:1px solid #1b2b44;background:#080f1b;color:#d6dde7;font-size:.76rem}
+.legend span{display:flex;align-items:center;gap:.32rem}.dot{width:11px;height:11px;border-radius:50%}
+.ops-title{font-size:1rem;font-weight:950}
+.compact-audit,.game-card,[data-testid="stMetric"]{
+  border-radius:17px!important;background:linear-gradient(145deg,rgba(10,24,43,.90),rgba(5,12,23,.92))!important;
+  border:1px solid rgba(121,170,221,.16)!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.18)!important
 }
-[data-testid="stExpander"]{border-radius:16px!important;border-color:rgba(126,177,230,.18)!important;background:rgba(7,16,29,.58)!important}
-[data-testid="stTabs"] [data-baseweb="tab-list"]{
- background:rgba(3,9,18,.76)!important;border:1px solid rgba(121,166,215,.16)!important;border-radius:18px!important;padding:.34rem!important
-}
-[data-testid="stTabs"] button[role="tab"]{min-height:50px!important;border-radius:13px!important;font-size:.93rem!important;font-weight:900!important}
-[data-testid="stTabs"] button[aria-selected="true"]{
- background:linear-gradient(135deg,rgba(42,137,231,.24),rgba(112,79,207,.22))!important;
- box-shadow:inset 0 0 0 1px rgba(121,196,255,.23)!important
-}
+[data-testid="stExpander"]{border-radius:15px!important;border-color:rgba(126,177,230,.18)!important;background:rgba(7,16,29,.58)!important}
 
 @media(max-width:780px){
- .cmd-shell{padding:1rem .92rem!important;border-radius:24px!important}
- .cmd-top{align-items:flex-start}
- .cmd-logo{width:54px;height:54px;border-radius:17px}
- .cmd-title{font-size:2.05rem}
- .cmd-badge{font-size:.65rem;padding:.48rem .62rem}
- .cmd-status{grid-template-columns:repeat(2,1fr)}
- .command-grid{grid-template-columns:1fr}
- .draw-stage-head{align-items:flex-start}
- .final-line{grid-template-columns:54px 1fr!important;padding:.6rem .55rem!important}
- .final-line .lotto-row{gap:.34rem!important;flex-wrap:nowrap!important}
- .final-line .ball{width:44px!important;height:44px!important;min-width:44px!important}
- .final-line .ball-num{font-size:1.06rem!important;color:#050505!important}
+  .block-container{padding:.45rem .72rem 3rem!important}
+  .cmd-shell{border-radius:24px;padding:1rem .92rem!important}
+  .cmd-top{align-items:flex-start}
+  .cmd-logo{width:54px;height:54px;border-radius:17px;font-size:1.6rem}
+  .cmd-title{font-size:2.02rem}
+  .cmd-badge{font-size:.62rem;padding:.46rem .58rem}
+  .cmd-status{grid-template-columns:repeat(2,1fr)}
+  .draw-stage-head{align-items:flex-start}
+  .command-grid{grid-template-columns:1fr}
+  .final-line{grid-template-columns:48px 1fr;padding:.6rem .55rem}
+  .final-line .lotto-row{gap:.34rem;flex-wrap:nowrap}
+  .final-line .ball{width:43px;height:43px;min-width:43px}
+  .final-line .ball-num{font-size:1.03rem}
+  .ball{width:58px;height:58px;flex-basis:58px}
+  .ball-num{font-size:1.62rem}
 }
 </style>
 """,unsafe_allow_html=True)
@@ -465,75 +321,66 @@ def _pick_font(size,bold=False):
     return ImageFont.load_default()
 
 def _ball_rgb(n):
-    # Official number-range palette:
-    # 1~10 yellow / 11~20 blue / 21~30 red / 31~40 black(dark gray) / 41~45 green
     n=int(n)
-    if n<=10:return (255,205,0)
-    if n<=20:return (24,135,248)
+    if n<=10:return (255,208,0)
+    if n<=20:return (22,135,248)
     if n<=30:return (243,38,46)
-    if n<=40:return (54,61,69)
+    if n<=40:return (55,60,66)
     return (32,185,86)
 
 def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):
-    W,H=1800,1250
-    im=Image.new('RGB',(W,H),(5,10,20))
-    d=ImageDraw.Draw(im)
-    # premium layered background
+    """Create the approved MD LOTTO 5-combination board as a high-resolution PNG."""
+    W,H=1800,1120
+    im=Image.new('RGB',(W,H),(3,16,34)); d=ImageDraw.Draw(im)
+    # deep navy premium background + gold frame
     for y in range(H):
-        a=y/(H-1)
-        c=(int(5+5*a),int(10+8*a),int(20+17*a))
-        d.line((0,y,W,y),fill=c)
-    d.ellipse((-180,-230,470,420),fill=(10,48,83))
-    d.ellipse((1020,-170,1570,380),fill=(45,28,84))
-    d.rounded_rectangle((72,64,W-72,H-64),radius=48,fill=(9,18,34),outline=(47,84,126),width=2)
-    f_k=_pick_font(32,True); f_t=_pick_font(78,True); f_s=_pick_font(38,True); f_date=_pick_font(42,True)
-    f_r=_pick_font(34,True); f_n=_pick_font(48,True); f_foot=_pick_font(25,False)
-    d.text((125,112),'MD LOTTO · OFFICIAL BALL EDITION',font=f_k,fill=(103,210,255))
-    d.text((125,165),'FINAL 5',font=f_t,fill=(247,250,255))
-    draw_txt=f'제 {int(target_draw)}회'
-    d.text((125,258),draw_txt,font=f_s,fill=(255,255,255))
+        a=y/(H-1); d.line((0,y,W,y),fill=(3+int(5*a),16+int(8*a),34+int(15*a)))
+    d.rounded_rectangle((18,18,W-18,H-18),radius=34,outline=(222,178,72),width=5)
+    d.rounded_rectangle((28,28,W-28,H-28),radius=30,outline=(105,77,27),width=2)
+    fk=_pick_font(34,True); ft=_pick_font(78,True); fm=_pick_font(48,True); fr=_pick_font(44,True); fn=_pick_font(50,True); fl=_pick_font(30,True)
+    d.text((70,45),'♛',font=ft,fill=(244,204,100))
+    d.text((160,55),'MD LOTTO',font=ft,fill=(247,218,143))
+    d.text((165,137),'BIG DATA · AI ANALYSIS · WINNING STRATEGY',font=fk,fill=(220,188,105))
+    d.text((930,72),'데이터가 만드는\n더 큰 가능성',font=fm,fill=(250,250,250),spacing=8)
+    # draw/date banner
+    d.rounded_rectangle((45,195,W-45,320),radius=25,fill=(245,239,216),outline=(226,184,79),width=5)
+    d.text((105,220),f'제 {int(target_draw)}회',font=ft,fill=(185,0,0))
     if draw_date is not None:
-        try:
-            date_txt=pd.Timestamp(draw_date).strftime('%Y년 %m월 %d일')
-        except Exception:
-            date_txt=str(draw_date)
-        d.text((430,255),f'추첨일  {date_txt}',font=f_date,fill=(232,196,106))
-    elif basis_draw is not None:
-        d.text((430,264),f'분석 기준 제 {int(basis_draw)}회',font=f_s,fill=(169,184,205))
-    y0=405
-    ball_r=52
+        try: date_txt=pd.Timestamp(draw_date).strftime('%Y년 %m월 %d일')
+        except Exception: date_txt=str(draw_date)
+        d.text((760,226),f'추첨일   {date_txt}',font=fm,fill=(15,42,154))
+    # five rows
+    row_colors=[(194,15,25),(12,92,205),(5,135,67),(232,112,4),(88,18,169)]
+    ybase=345; rowh=125
     for idx,g in enumerate(games,1):
-        y=y0+(idx-1)*142
-        d.rounded_rectangle((118,y-22,W-118,y+98),radius=28,fill=(12,25,45),outline=(35,61,91),width=2)
-        d.text((152,y+22),f'{idx}',font=f_r,fill=(120,210,255))
-        x=330
+        y=ybase+(idx-1)*rowh
+        d.rounded_rectangle((45,y,W-45,y+112),radius=24,fill=(238,241,244),outline=(35,40,48),width=3)
+        d.rounded_rectangle((55,y+7,300,y+105),radius=22,fill=row_colors[idx-1],outline=(255,255,255),width=2)
+        label=f'{idx}조합'; bb=d.textbbox((0,0),label,font=fr); d.text((178-(bb[2]-bb[0])/2,y+52-(bb[3]-bb[1])/2-4),label,font=fr,fill=(255,255,255))
+        x=350
         for n in g:
-            rgb=_ball_rgb(n)
-            x0,y0b=x,y-5
-            x1,y1b=x+ball_r*2,y-5+ball_r*2
-            # shadow
-            d.ellipse((x0+10,y1b-4,x1-6,y1b+18),fill=(0,0,0))
-            # glossy colored outer shell
-            d.ellipse((x0,y0b,x1,y1b),fill=rgb,outline=(244,247,250),width=3)
-            # lower-right shade
-            shade=tuple(max(0,int(c*.50)) for c in rgb)
-            d.arc((x0+4,y0b+4,x1-4,y1b-4),18,158,fill=tuple(min(255,int(c*1.18)) for c in rgb),width=5)
-            d.arc((x0+5,y0b+5,x1-5,y1b-5),185,335,fill=shade,width=8)
-            # specular highlight
-            d.ellipse((x0+17,y0b+11,x0+46,y0b+28),fill=(255,255,255))
-            # official-style white/silver number disc
-            inner=35
-            cx,cy=x0+ball_r,y0b+ball_r
-            d.ellipse((cx-inner,cy-inner,cx+inner,cy+inner),fill=(245,247,249),outline=(216,220,225),width=2)
-            d.ellipse((cx-inner+8,cy-inner+7,cx+inner-12,cy-inner+20),fill=(255,255,255))
-            # bold black number, optically centered
-            s=str(int(n))
-            bb=d.textbbox((0,0),s,font=f_n)
-            tw,th=bb[2]-bb[0],bb[3]-bb[1]
-            d.text((cx-tw/2,cy-th/2-5),s,font=f_n,fill=(5,5,5))
-            x+=180
-    footer='MD LOTTO 6/45 · Research & Personal Analysis'
-    d.text((125,H-112),footer,font=f_foot,fill=(101,119,145))
+            rgb=_ball_rgb(n); R=48; x0=x; y0=y+8; cx=x0+R; cy=y0+R
+            shade=tuple(max(0,int(c*.43)) for c in rgb); mid=tuple(max(0,min(255,int(c*.78))) for c in rgb); light=tuple(max(0,min(255,int(c*1.12+16))) for c in rgb)
+            d.ellipse((x0+10,y0+84,x0+90,y0+108),fill=(150,150,150))
+            d.ellipse((x0,y0,x0+96,y0+96),fill=shade,outline=(255,255,255),width=2)
+            d.ellipse((x0+4,y0+3,x0+92,y0+91),fill=mid)
+            d.ellipse((x0+9,y0+7,x0+86,y0+84),fill=rgb)
+            d.ellipse((x0+13,y0+10,x0+55,y0+38),fill=light)
+            d.ellipse((x0+18,y0+10,x0+43,y0+21),fill=(255,255,255))
+            # approved design: white center disc + bold black centered number
+            d.ellipse((cx-31,cy-31,cx+31,cy+31),fill=(250,250,248),outline=(225,225,222),width=2)
+            ss=str(int(n)); bb=d.textbbox((0,0),ss,font=fn); tw,th=bb[2]-bb[0],bb[3]-bb[1]
+            d.text((cx-tw/2,cy-th/2-5),ss,font=fn,fill=(0,0,0))
+            x+=225
+    # legend
+    ly=985
+    d.rounded_rectangle((45,ly,W-45,H-35),radius=20,fill=(5,25,50),outline=(208,164,65),width=2)
+    d.text((75,ly+30),'번호 구간별 색상',font=fk,fill=(255,255,255))
+    legend=[('1 ~ 10  노랑',(255,208,0)),('11 ~ 20  파랑',(22,135,248)),('21 ~ 30  빨강',(243,38,46)),('31 ~ 40  검정',(55,60,66)),('41 ~ 45  초록',(32,185,86))]
+    lx=380
+    for txt,c in legend:
+        d.ellipse((lx,ly+25,lx+50,ly+75),fill=c,outline=(255,255,255),width=2)
+        d.text((lx+62,ly+31),txt,font=fl,fill=(255,255,255)); lx+=275
     out=BytesIO(); im.save(out,format='PNG',optimize=True)
     return out.getvalue()
 
@@ -850,7 +697,7 @@ st.markdown(
             <div class="cmd-sub">Adaptive Correction · Learning Loop · Integrated Simulation</div>
           </div>
         </div>
-        <div class="cmd-badge">V7.1 OFFICIAL</div>
+        <div class="cmd-badge">V7.2 CLEAN PREMIUM</div>
       </div>
       <div class="cmd-status">
         <div class="cmd-stat {_status_class}"><div class="lab">SYSTEM</div><div class="val">{_status_text}</div></div>
@@ -1073,7 +920,7 @@ with tabs[2]:
                         'target_draw':int(latest.draw_no)+1,
                         'created_from_draw':int(latest.draw_no),
                         'games':[list(map(int,c)) for c in st.session_state['md_games'].combo.tolist()],
-                        'mode':'V7_1_OFFICIAL_BALL_PRIORITY5'
+                        'mode':'V7_2_CLEAN_PREMIUM_PRIORITY5'
                     }
                     record_recommendation(
                         learning_path,
@@ -1241,4 +1088,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-st.caption('MD LOTTO 6/45 · v7.0 Obsidian Command · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+st.caption('MD LOTTO 6/45 · v7.3 CLEAN PREMIUM · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

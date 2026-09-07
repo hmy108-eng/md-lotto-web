@@ -1,4 +1,4 @@
-# MD LOTTO v7.6 TEMPLATE LOCKED - FINAL WHITE-CENTER BALL TEMPLATE
+# MD LOTTO v7.6 TEMPLATE LOCKED - EXACT SIGNATURE GOLD
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -200,19 +200,19 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None)
             date_txt=str(draw_date)
         d.text((1165,167),date_txt,font=f_date,fill=(9,41,174),anchor='mm')
 
-    # --- 2) FINAL LOCKED LOTTO BALL TEMPLATE ---
-    # Draw every dynamic ball from one renderer instead of cropping sample balls from
-    # the background template. This prevents old sample colors/numbers from leaking
-    # through and guarantees the approved white-center + colored 3D rim design.
+    # --- 2) FINAL LOCKED LOTTO BALL RENDERER ---
+    # Do NOT crop/reuse sample balls from the template. Every displayed number is
+    # freshly rendered with the same locked geometry: colored 3D outer sphere,
+    # large white center disc, and bold black number.
     centers_x=[428,618,808,998,1188,1378]
     centers_y=[300,430,560,690,820]
     f_num=_pick_font(47,True)
     for g,cy in zip(games,centers_y):
         for cx,n in zip(centers_x,g):
             n=int(n)
-            # Completely cover the sample ball embedded in the static board first.
-            # Keep the surrounding row frame/label untouched.
-            d.ellipse((cx-67,cy-67,cx+67,cy+73),fill=(242,244,247))
+            # Cover the sample ball embedded in the static board. The replacement
+            # ball is then drawn entirely by the locked renderer below.
+            d.ellipse((cx-64,cy-64,cx+64,cy+70),fill=(242,244,247))
             _draw_signature_ball(d,cx,cy,n,f_num)
 
     out=BytesIO(); base.save(out,format='PNG',optimize=True)
@@ -900,4 +900,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-st.caption('MD LOTTO 6/45 · v7.3 CLEAN PREMIUM · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+st.caption('MD LOTTO 6/45 · v7.6 TEMPLATE LOCKED · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

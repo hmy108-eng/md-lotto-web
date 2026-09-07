@@ -1,4 +1,4 @@
-# MD LOTTO v7.6 TEMPLATE LOCKED - EXACT SIGNATURE GOLD
+# MD LOTTO v7.6 TEMPLATE LOCKED - BIG NUMBER FINAL
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -164,15 +164,35 @@ def _draw_signature_ball(d,cx,cy,n,font=None):
     d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(253,253,251),outline=(232,232,229),width=2)
     d.ellipse((cx-ir+5,cy-ir+4,cx+ir-8,cy-ir+12),fill=(255,255,255))
 
-    # Mobile-readable number: size is selected per digit count, not inherited from the board.
-    # This is intentionally large so the number remains legible after the 1536px board
-    # is scaled down to a ~650px-wide phone screen.
+    # FINAL MOBILE NUMBER FIT:
+    # Automatically make each number fill the white medallion instead of using
+    # a small fixed font.  The target box is ~88% of the white circle diameter.
     s=str(n)
-    num_font=_pick_font(46 if n < 10 else 35, True)
-    bb=d.textbbox((0,0),s,font=num_font)
-    tw=bb[2]-bb[0]; th=bb[3]-bb[1]
-    # textbbox has font-specific top bearing; anchor='mm' gives stable optical centering.
-    d.text((cx,cy-1),s,font=num_font,fill=(0,0,0),anchor='mm',stroke_width=1,stroke_fill=(0,0,0))
+    max_w=int((ir*2)*0.88)
+    max_h=int((ir*2)*0.82)
+    best_font=None
+    best_bb=None
+    # Search downward from a deliberately large ExtraBold/Bold size.
+    for fs in range(78, 17, -1):
+        f=_pick_font(fs, True)
+        bb=d.textbbox((0,0),s,font=f,stroke_width=1)
+        tw=bb[2]-bb[0]
+        th=bb[3]-bb[1]
+        if tw<=max_w and th<=max_h:
+            best_font=f
+            best_bb=bb
+            break
+    if best_font is None:
+        best_font=_pick_font(18, True)
+        best_bb=d.textbbox((0,0),s,font=best_font,stroke_width=1)
+
+    # Center from the measured bounding box so 1-digit and 2-digit values both
+    # occupy the white circle strongly and remain readable on a phone.
+    bb=best_bb
+    tx=cx-(bb[0]+bb[2])/2
+    ty=cy-(bb[1]+bb[3])/2
+    d.text((tx,ty),s,font=best_font,fill=(0,0,0),
+           stroke_width=1,stroke_fill=(0,0,0))
 
 
 def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):

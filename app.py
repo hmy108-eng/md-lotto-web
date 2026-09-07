@@ -1,4 +1,4 @@
-# MD LOTTO v6.3 AURORA GLASS - PREMIUM FINAL5
+# MD LOTTO v7.1 OFFICIAL BALL EDITION - PREMIUM
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -69,26 +69,62 @@ html,body,[class*="css"]{font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-
 .brand-title{font-size:clamp(1.8rem,5vw,2.55rem);font-weight:1000;letter-spacing:-.045em;line-height:1;background:linear-gradient(180deg,#fff,#eef1f7 56%,#b8beca);-webkit-background-clip:text;color:transparent;text-shadow:0 8px 20px rgba(0,0,0,.24)}.brand-sub{position:relative;z-index:1;color:#aeb8c9;margin:.65rem 0 0;font-size:.93rem}
 .sync-ok,.sync-warn{display:flex;align-items:center;gap:1rem;padding:1rem 1.15rem;border-radius:18px;margin:.55rem 0 1.15rem;font-weight:800}.sync-ok{background:linear-gradient(90deg,rgba(18,82,50,.44),rgba(6,27,25,.72));border:1px solid rgba(45,214,112,.38)}.sync-warn{background:linear-gradient(90deg,rgba(104,62,11,.38),rgba(40,26,8,.70));border:1px solid rgba(255,180,55,.38)}.sync-icon{font-size:1.6rem}.sync-main{font-size:1.28rem}.sync-detail{color:#d7deea;font-weight:650;font-size:1.12rem}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:1.15rem 0 .65rem}.section-title{font-size:1.52rem;font-weight:950}.date-chip{font-size:1rem;color:#b8dcff;padding:.48rem .78rem;border-radius:12px;background:#0b2242;border:1px solid #174d87}
-.lotto-row{display:flex;gap:.56rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.28rem 0 .9rem;perspective:1000px}.ball{--c1:#FFF06A;--c2:#FFC400;--c3:#9A4E00;position:relative;width:70px;height:70px;flex:0 0 70px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-background:
-radial-gradient(ellipse at 25% 14%,#ffffff 0 4%,rgba(255,255,255,.98) 5% 10%,rgba(255,255,255,.40) 13%,transparent 27%),
-radial-gradient(circle at 35% 30%,var(--c1) 0 16%,var(--c2) 46%,var(--c3) 100%);
-border:2px solid rgba(255,255,255,.95);
-box-shadow:
-inset 12px 13px 18px rgba(255,255,255,.52),
-inset -15px -18px 24px rgba(0,0,0,.62),
-inset 0 0 0 2px rgba(255,255,255,.20),
-0 11px 18px rgba(0,0,0,.60);
-filter:saturate(1.65) contrast(1.14)}
-.ball:before{content:"";position:absolute;left:8%;top:5%;width:52%;height:24%;border-radius:50%;
-background:linear-gradient(168deg,#fff 0%,rgba(255,255,255,.98) 30%,rgba(255,255,255,.30) 68%,transparent 100%);
-transform:rotate(-23deg);opacity:1;z-index:4;pointer-events:none}.ball:after{content:"";position:absolute;left:13%;right:13%;bottom:-10px;height:12px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.72) 0%,rgba(0,0,0,.36) 48%,transparent 78%);filter:blur(4px);z-index:-1;pointer-events:none}
-.ball-num{position:relative;z-index:5;display:flex;align-items:center;justify-content:center;width:72%;height:72%;border-radius:50%;
-font-size:2.08rem;font-weight:1000;line-height:1;letter-spacing:-.06em;color:#fff;
--webkit-text-stroke:1.6px #06080c;text-shadow:0 3px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.78);
-background:radial-gradient(circle at 40% 28%,rgba(255,255,255,.10),rgba(255,255,255,.01) 48%,rgba(0,0,0,.16) 100%);
-box-shadow:inset 0 1px 2px rgba(255,255,255,.25),inset 0 -2px 4px rgba(0,0,0,.30)}
-.b1{--c1:#FFF06A;--c2:#FFC400;--c3:#9A4E00}.b2{--c1:#61C8FF;--c2:#0066FF;--c3:#00165E}.b3{--c1:#FF7770;--c2:#F00000;--c3:#650000}.b4{--c1:#FFFFFF;--c2:#AEB4BC;--c3:#30363D}.b5{--c1:#70FF86;--c2:#00B935;--c3:#003D12}.bonus{width:76px;height:76px;flex-basis:76px;box-shadow:inset 10px 12px 18px rgba(255,255,255,.35),inset -14px -18px 23px rgba(0,0,0,.47),0 0 0 3px #ffbd28,0 0 0 6px rgba(255,220,88,.22),0 14px 22px rgba(0,0,0,.48)}.bonus .ball-num{font-size:2.12rem}.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
+.lotto-row{display:flex;gap:.62rem;flex-wrap:wrap;align-items:center;margin:.55rem 0 1rem;padding:.34rem 0 .9rem;perspective:1000px}
+.ball{
+ --c1:#FFE65C;--c2:#FFC400;--c3:#9B6400;
+ position:relative;width:72px;height:72px;flex:0 0 72px;border-radius:50%;
+ display:inline-flex;align-items:center;justify-content:center;
+ background:
+   radial-gradient(ellipse at 29% 17%,rgba(255,255,255,.98) 0 5%,rgba(255,255,255,.68) 6% 12%,rgba(255,255,255,.14) 16%,transparent 29%),
+   radial-gradient(circle at 35% 31%,var(--c1) 0 18%,var(--c2) 49%,var(--c3) 100%);
+ border:2px solid rgba(255,255,255,.88);
+ box-shadow:
+   inset 10px 12px 17px rgba(255,255,255,.35),
+   inset -14px -18px 22px rgba(0,0,0,.46),
+   0 12px 18px rgba(0,0,0,.52);
+ filter:saturate(1.25) contrast(1.08)
+}
+.ball:before{
+ content:"";position:absolute;left:10%;top:7%;width:46%;height:21%;border-radius:50%;
+ background:linear-gradient(165deg,rgba(255,255,255,1),rgba(255,255,255,.74) 38%,rgba(255,255,255,.10) 76%,transparent);
+ transform:rotate(-22deg);z-index:4;pointer-events:none
+}
+.ball:after{
+ content:"";position:absolute;left:14%;right:14%;bottom:-10px;height:12px;border-radius:50%;
+ background:radial-gradient(ellipse,rgba(0,0,0,.64),rgba(0,0,0,.22) 52%,transparent 78%);
+ filter:blur(4px);z-index:-1;pointer-events:none
+}
+.ball-num{
+ position:relative;z-index:6;display:flex;align-items:center;justify-content:center;
+ width:67%;height:67%;border-radius:50%;
+ font-size:2rem;font-weight:1000;line-height:1;letter-spacing:-.065em;
+ color:#050505!important;-webkit-text-stroke:0!important;
+ text-shadow:0 1px 0 rgba(255,255,255,.55)!important;
+ background:
+   radial-gradient(circle at 34% 27%,#ffffff 0 22%,#f7f7f7 48%,#e4e7ea 78%,#c9ced4 100%);
+ border:1px solid rgba(255,255,255,.90);
+ box-shadow:
+   inset 4px 5px 7px rgba(255,255,255,.92),
+   inset -5px -7px 9px rgba(0,0,0,.15),
+   0 1px 4px rgba(0,0,0,.24)
+}
+/* Official Lotto 6/45 number-range colors */
+.b1{--c1:#FFE86A;--c2:#FFD000;--c3:#A46C00} /* 1~10 yellow */
+.b2{--c1:#60C5FF;--c2:#1687F8;--c3:#004EAC} /* 11~20 blue */
+.b3{--c1:#FF7777;--c2:#F3262E;--c3:#9B0008} /* 21~30 red */
+.b4{--c1:#AEB5BE;--c2:#4C535C;--c3:#11151A} /* 31~40 black/dark gray */
+.b5{--c1:#6DF58A;--c2:#20B956;--c3:#08712A} /* 41~45 green */
+.bonus{
+ width:78px;height:78px;flex-basis:78px;
+ box-shadow:
+   inset 10px 12px 17px rgba(255,255,255,.35),
+   inset -14px -18px 22px rgba(0,0,0,.46),
+   0 0 0 3px #E8C24B,
+   0 0 0 6px rgba(232,194,75,.18),
+   0 14px 22px rgba(0,0,0,.48)
+}
+.bonus .ball-num{font-size:2.08rem}
+.bonus-label{font-size:2rem;font-weight:1000;color:#eef2f8;margin:0 .08rem;text-shadow:0 3px 5px #000}
 .legend{display:flex;gap:.9rem;flex-wrap:wrap;padding:.55rem .7rem;border-radius:14px;border:1px solid #1b2a43;background:#090f1b;margin:-.15rem 0 1rem;color:#d5dbe5;font-size:.78rem}.legend span{display:flex;align-items:center;gap:.32rem}.dot{width:11px;height:11px;border-radius:50%}
 .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.65rem 0 1.1rem}.kpi{position:relative;overflow:hidden;border-radius:17px;padding:1rem 1rem 1.08rem;border:1px solid #24334e;background:linear-gradient(145deg,#0c1423,#08101c);min-height:122px;box-shadow:0 12px 26px rgba(0,0,0,.22)}.kpi:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(25,132,255,.18),transparent 45%)}.kpi.purple:before{background:radial-gradient(circle at 10% 0%,rgba(158,77,255,.20),transparent 48%)}.kpi.red:before{background:radial-gradient(circle at 10% 0%,rgba(255,65,106,.20),transparent 48%)}.kpi-label{position:relative;color:#c9d2e1;font-size:1rem;font-weight:800}.kpi-value{position:relative;font-size:2.12rem;font-weight:950;margin-top:.58rem}.kpi-value.redv{color:#ff5c7a}.kpi-sub{position:relative;font-size:.88rem;color:#8f9bb0;margin-top:.18rem}
 .menu-title{font-size:1.38rem;font-weight:950;margin:.7rem 0 .7rem}.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1.15rem}.menu-card{border:1px solid #243450;border-radius:17px;padding:1rem .7rem;text-align:center;background:linear-gradient(160deg,#0d1728,#08111f);box-shadow:0 10px 24px rgba(0,0,0,.22);min-height:132px}.menu-card.blue{border-color:#155aa4;background:linear-gradient(160deg,#0c315f,#07182d)}.menu-card.green{border-color:#2e6f31;background:linear-gradient(160deg,#153b18,#08190d)}.menu-card.orange{border-color:#8b5117;background:linear-gradient(160deg,#4b270d,#1b1006)}.menu-card.violet{border-color:#67318b;background:linear-gradient(160deg,#351449,#16091f)}.menu-icon{font-size:2.05rem}.menu-name{font-size:1.18rem;font-weight:950;margin-top:.38rem}.menu-desc{font-size:.86rem;color:#c1cad8;margin-top:.24rem}
@@ -178,7 +214,7 @@ box-shadow:inset 0 1px 2px rgba(255,255,255,.25),inset 0 -2px 4px rgba(0,0,0,.30
   .week-step .desc{font-size:.69rem}
 }
 
-/* v6.3 AURORA GLASS — visual redesign */
+/* v7.0 OBSIDIAN GLASS — visual redesign */
 :root{--aurora:#70d7ff;--aurora2:#9f7cff;--glass:rgba(12,20,38,.76);--glass2:rgba(18,29,52,.68)}
 .stApp{
  background:
@@ -248,6 +284,150 @@ div.stButton>button:hover,div.stDownloadButton>button:hover{
  .final-line .ball{width:39px;height:39px;min-width:39px}
  .action-strip{grid-template-columns:1fr}
 }
+
+/* v7.0 OBSIDIAN COMMAND — radical premium layout */
+:root{
+ --ink:#02050b;--panel:#07111f;--panel2:#0a1728;--cyan:#6be2ff;--vio:#9e7dff;
+ --gold:#e7c46a;--line:rgba(148,190,236,.20);--muted:#8fa3bc;
+}
+.stApp{
+ background:
+ radial-gradient(circle at 50% -15%,rgba(39,121,210,.18),transparent 32%),
+ radial-gradient(circle at 92% 12%,rgba(129,82,222,.13),transparent 26%),
+ linear-gradient(180deg,#01040a 0%,#050b14 45%,#02050a 100%)!important;
+}
+.block-container{max-width:1240px!important;padding-top:.45rem!important;padding-bottom:4rem!important}
+#MainMenu,footer,[data-testid="stHeader"]{visibility:hidden!important}
+
+/* premium command header */
+.cmd-shell{
+ position:relative;overflow:hidden;border-radius:30px;margin:.25rem 0 1rem;padding:1.35rem 1.45rem 1.2rem;
+ background:
+ linear-gradient(120deg,rgba(13,28,49,.98),rgba(5,12,24,.98) 65%),
+ radial-gradient(circle at 90% 10%,rgba(101,75,205,.18),transparent 35%);
+ border:1px solid rgba(151,203,255,.24);
+ box-shadow:0 28px 70px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.06)
+}
+.cmd-shell:before{
+ content:"";position:absolute;inset:auto -80px -120px auto;width:360px;height:360px;border-radius:50%;
+ background:radial-gradient(circle,rgba(69,184,255,.12),transparent 68%);filter:blur(8px)
+}
+.cmd-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;z-index:1}
+.cmd-brand{display:flex;align-items:center;gap:1rem}
+.cmd-logo{
+ width:66px;height:66px;border-radius:20px;display:grid;place-items:center;font-size:2rem;
+ background:linear-gradient(145deg,#102a4d,#08111f);border:1px solid rgba(116,202,255,.28);
+ box-shadow:0 14px 30px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.08)
+}
+.cmd-eyebrow{font-size:.72rem;letter-spacing:.18em;color:#70dfff;font-weight:900}
+.cmd-title{font-size:clamp(2rem,5vw,3.15rem);line-height:.95;font-weight:1000;letter-spacing:-.05em;color:#fff}
+.cmd-title span{background:linear-gradient(90deg,#6be2ff,#b392ff);-webkit-background-clip:text;color:transparent}
+.cmd-sub{margin-top:.55rem;color:#95a8c2;font-size:.93rem}
+.cmd-badge{
+ flex:0 0 auto;border-radius:999px;padding:.58rem .9rem;font-weight:900;font-size:.76rem;letter-spacing:.08em;
+ color:#06111c;background:linear-gradient(90deg,#71dfff,#d8c5ff);box-shadow:0 8px 24px rgba(91,180,255,.18)
+}
+.cmd-status{
+ position:relative;z-index:1;display:grid;grid-template-columns:1.45fr 1fr 1fr 1fr;gap:.55rem;margin-top:1rem
+}
+.cmd-stat{
+ border:1px solid rgba(132,181,230,.17);border-radius:17px;padding:.72rem .78rem;
+ background:linear-gradient(145deg,rgba(12,27,48,.80),rgba(5,12,23,.82))
+}
+.cmd-stat .lab{font-size:.68rem;color:#7f94ae;font-weight:800;letter-spacing:.04em}
+.cmd-stat .val{font-size:1.03rem;color:#f7f9fc;font-weight:950;margin-top:.16rem}
+.cmd-stat.live{border-color:rgba(66,223,137,.25)}
+.cmd-stat.live .val{color:#62e8a2}
+
+/* latest draw stage */
+.draw-stage{
+ margin:.85rem 0 1rem;border-radius:26px;padding:1rem 1.1rem 1.05rem;
+ background:linear-gradient(145deg,rgba(11,22,39,.88),rgba(5,11,21,.90));
+ border:1px solid rgba(130,176,224,.18);box-shadow:0 18px 40px rgba(0,0,0,.22)
+}
+.draw-stage-head{display:flex;align-items:end;justify-content:space-between;gap:.8rem;margin-bottom:.3rem}
+.draw-stage-kicker{font-size:.68rem;font-weight:900;letter-spacing:.13em;color:#78dfff}
+.draw-stage-title{font-size:1.35rem;font-weight:950;color:#fff}
+.draw-stage-date{font-size:.78rem;color:#93a6bf;border:1px solid #273d5b;border-radius:999px;padding:.38rem .62rem}
+
+/* command navigation cards */
+.command-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:.75rem 0 1rem}
+.command-card{
+ border:1px solid rgba(128,178,229,.18);border-radius:21px;padding:.9rem .9rem .85rem;
+ background:linear-gradient(150deg,rgba(11,27,49,.86),rgba(5,13,25,.88));
+ box-shadow:0 14px 32px rgba(0,0,0,.20)
+}
+.command-card.hot{border-color:rgba(103,217,255,.34);background:linear-gradient(150deg,rgba(14,43,73,.90),rgba(7,17,31,.92))}
+.command-card .no{font-size:.68rem;font-weight:950;color:#70dfff;letter-spacing:.10em}
+.command-card .ttl{font-size:1.03rem;font-weight:950;color:#fff;margin-top:.22rem}
+.command-card .txt{font-size:.75rem;line-height:1.4;color:#879bb4;margin-top:.18rem}
+
+/* heavyweight action buttons */
+div.stButton>button,div.stDownloadButton>button{
+ min-height:58px!important;border-radius:17px!important;border:1px solid rgba(136,210,255,.35)!important;
+ background:
+ linear-gradient(180deg,rgba(255,255,255,.08),transparent 28%),
+ linear-gradient(125deg,#0b76d5 0%,#4a62df 54%,#7654c9 100%)!important;
+ box-shadow:0 14px 34px rgba(36,94,196,.30),inset 0 1px rgba(255,255,255,.24)!important;
+ color:#fff!important;font-size:1rem!important;font-weight:950!important;letter-spacing:-.02em!important
+}
+div.stButton>button:hover,div.stDownloadButton>button:hover{
+ transform:translateY(-2px)!important;
+ box-shadow:0 20px 42px rgba(43,115,230,.38),inset 0 1px rgba(255,255,255,.28)!important
+}
+
+/* new final5 showcase */
+.final-board{
+ padding:1.25rem!important;border-radius:28px!important;
+ background:
+ radial-gradient(circle at 8% 0%,rgba(64,185,255,.12),transparent 24%),
+ linear-gradient(145deg,#0b1a2e,#050c18)!important;
+ border:1px solid rgba(124,199,255,.27)!important;
+ box-shadow:0 24px 60px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.06)!important
+}
+.final-kicker{font-size:.72rem!important;letter-spacing:.16em!important;color:#6fe2ff!important}
+.final-title{font-size:1.6rem!important}
+.final-grid{grid-template-columns:1fr!important;gap:.58rem!important}
+.final-line{
+ display:grid!important;grid-template-columns:70px 1fr!important;align-items:center!important;
+ text-align:left!important;padding:.68rem .8rem!important;border-radius:18px!important;
+ background:linear-gradient(90deg,rgba(13,31,55,.92),rgba(5,13,25,.84))!important;
+ border:1px solid rgba(119,173,228,.17)!important
+}
+.final-rank{font-size:.92rem!important;color:#78dfff!important;margin:0!important}
+.final-line .lotto-row{justify-content:flex-start!important;gap:.65rem!important;margin:0!important;padding:0!important}
+.final-line .ball{width:60px!important;height:60px!important;min-width:60px!important}
+.final-line .ball-num{font-size:1.38rem!important;font-weight:1000!important;color:#050505!important}
+
+/* cleaner content panels */
+[data-testid="stMetric"]{
+ border-radius:18px!important;background:linear-gradient(145deg,rgba(10,24,43,.88),rgba(5,12,23,.90))!important;
+ border:1px solid rgba(121,170,221,.16)!important;padding:.65rem!important
+}
+[data-testid="stExpander"]{border-radius:16px!important;border-color:rgba(126,177,230,.18)!important;background:rgba(7,16,29,.58)!important}
+[data-testid="stTabs"] [data-baseweb="tab-list"]{
+ background:rgba(3,9,18,.76)!important;border:1px solid rgba(121,166,215,.16)!important;border-radius:18px!important;padding:.34rem!important
+}
+[data-testid="stTabs"] button[role="tab"]{min-height:50px!important;border-radius:13px!important;font-size:.93rem!important;font-weight:900!important}
+[data-testid="stTabs"] button[aria-selected="true"]{
+ background:linear-gradient(135deg,rgba(42,137,231,.24),rgba(112,79,207,.22))!important;
+ box-shadow:inset 0 0 0 1px rgba(121,196,255,.23)!important
+}
+
+@media(max-width:780px){
+ .cmd-shell{padding:1rem .92rem!important;border-radius:24px!important}
+ .cmd-top{align-items:flex-start}
+ .cmd-logo{width:54px;height:54px;border-radius:17px}
+ .cmd-title{font-size:2.05rem}
+ .cmd-badge{font-size:.65rem;padding:.48rem .62rem}
+ .cmd-status{grid-template-columns:repeat(2,1fr)}
+ .command-grid{grid-template-columns:1fr}
+ .draw-stage-head{align-items:flex-start}
+ .final-line{grid-template-columns:54px 1fr!important;padding:.6rem .55rem!important}
+ .final-line .lotto-row{gap:.34rem!important;flex-wrap:nowrap!important}
+ .final-line .ball{width:44px!important;height:44px!important;min-width:44px!important}
+ .final-line .ball-num{font-size:1.06rem!important;color:#050505!important}
+}
 </style>
 """,unsafe_allow_html=True)
 
@@ -285,15 +465,17 @@ def _pick_font(size,bold=False):
     return ImageFont.load_default()
 
 def _ball_rgb(n):
+    # Official number-range palette:
+    # 1~10 yellow / 11~20 blue / 21~30 red / 31~40 black(dark gray) / 41~45 green
     n=int(n)
-    if n<=10:return (244,183,30)
-    if n<=20:return (45,143,244)
-    if n<=30:return (239,77,91)
-    if n<=40:return (139,149,165)
-    return (63,181,91)
+    if n<=10:return (255,205,0)
+    if n<=20:return (24,135,248)
+    if n<=30:return (243,38,46)
+    if n<=40:return (54,61,69)
+    return (32,185,86)
 
-def recommendation_image_bytes(games,target_draw,basis_draw=None):
-    W,H=1400,900
+def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):
+    W,H=1800,1250
     im=Image.new('RGB',(W,H),(5,10,20))
     d=ImageDraw.Draw(im)
     # premium layered background
@@ -303,31 +485,55 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None):
         d.line((0,y,W,y),fill=c)
     d.ellipse((-180,-230,470,420),fill=(10,48,83))
     d.ellipse((1020,-170,1570,380),fill=(45,28,84))
-    d.rounded_rectangle((72,64,W-72,H-64),radius=42,fill=(9,18,34),outline=(47,84,126),width=2)
-    f_k=_pick_font(25,True); f_t=_pick_font(52,True); f_s=_pick_font(24,False)
-    f_r=_pick_font(25,True); f_n=_pick_font(27,True); f_foot=_pick_font(20,False)
-    d.text((118,105),'MD LOTTO · ADAPTIVE CORRECTION',font=f_k,fill=(103,210,255))
-    d.text((118,148),'FINAL 5',font=f_t,fill=(247,250,255))
-    d.text((118,215),f'제 {int(target_draw)}회 최종 추천 조합',font=f_s,fill=(169,184,205))
-    if basis_draw is not None:
-        txt=f'분석 기준: 제 {int(basis_draw)}회'
-        box=d.textbbox((0,0),txt,font=f_s)
-        d.text((W-118-(box[2]-box[0]),166),txt,font=f_s,fill=(145,160,184))
-    y0=292
-    ball_r=34
+    d.rounded_rectangle((72,64,W-72,H-64),radius=48,fill=(9,18,34),outline=(47,84,126),width=2)
+    f_k=_pick_font(32,True); f_t=_pick_font(78,True); f_s=_pick_font(38,True); f_date=_pick_font(42,True)
+    f_r=_pick_font(34,True); f_n=_pick_font(48,True); f_foot=_pick_font(25,False)
+    d.text((125,112),'MD LOTTO · OFFICIAL BALL EDITION',font=f_k,fill=(103,210,255))
+    d.text((125,165),'FINAL 5',font=f_t,fill=(247,250,255))
+    draw_txt=f'제 {int(target_draw)}회'
+    d.text((125,258),draw_txt,font=f_s,fill=(255,255,255))
+    if draw_date is not None:
+        try:
+            date_txt=pd.Timestamp(draw_date).strftime('%Y년 %m월 %d일')
+        except Exception:
+            date_txt=str(draw_date)
+        d.text((430,255),f'추첨일  {date_txt}',font=f_date,fill=(232,196,106))
+    elif basis_draw is not None:
+        d.text((430,264),f'분석 기준 제 {int(basis_draw)}회',font=f_s,fill=(169,184,205))
+    y0=405
+    ball_r=52
     for idx,g in enumerate(games,1):
-        y=y0+(idx-1)*102
-        d.rounded_rectangle((118,y-15,W-118,y+70),radius=22,fill=(12,25,45),outline=(35,61,91),width=2)
-        d.text((148,y+10),f'{idx}',font=f_r,fill=(120,210,255))
-        x=270
+        y=y0+(idx-1)*142
+        d.rounded_rectangle((118,y-22,W-118,y+98),radius=28,fill=(12,25,45),outline=(35,61,91),width=2)
+        d.text((152,y+22),f'{idx}',font=f_r,fill=(120,210,255))
+        x=330
         for n in g:
             rgb=_ball_rgb(n)
-            d.ellipse((x,y-1,x+ball_r*2,y-1+ball_r*2),fill=rgb,outline=(255,255,255),width=2)
-            s=str(int(n)); bb=d.textbbox((0,0),s,font=f_n)
-            d.text((x+ball_r-(bb[2]-bb[0])/2,y-1+ball_r-(bb[3]-bb[1])/2-2),s,font=f_n,fill=(255,255,255))
-            x+=112
+            x0,y0b=x,y-5
+            x1,y1b=x+ball_r*2,y-5+ball_r*2
+            # shadow
+            d.ellipse((x0+10,y1b-4,x1-6,y1b+18),fill=(0,0,0))
+            # glossy colored outer shell
+            d.ellipse((x0,y0b,x1,y1b),fill=rgb,outline=(244,247,250),width=3)
+            # lower-right shade
+            shade=tuple(max(0,int(c*.50)) for c in rgb)
+            d.arc((x0+4,y0b+4,x1-4,y1b-4),18,158,fill=tuple(min(255,int(c*1.18)) for c in rgb),width=5)
+            d.arc((x0+5,y0b+5,x1-5,y1b-5),185,335,fill=shade,width=8)
+            # specular highlight
+            d.ellipse((x0+17,y0b+11,x0+46,y0b+28),fill=(255,255,255))
+            # official-style white/silver number disc
+            inner=35
+            cx,cy=x0+ball_r,y0b+ball_r
+            d.ellipse((cx-inner,cy-inner,cx+inner,cy+inner),fill=(245,247,249),outline=(216,220,225),width=2)
+            d.ellipse((cx-inner+8,cy-inner+7,cx+inner-12,cy-inner+20),fill=(255,255,255))
+            # bold black number, optically centered
+            s=str(int(n))
+            bb=d.textbbox((0,0),s,font=f_n)
+            tw,th=bb[2]-bb[0],bb[3]-bb[1]
+            d.text((cx-tw/2,cy-th/2-5),s,font=f_n,fill=(5,5,5))
+            x+=180
     footer='MD LOTTO 6/45 · Research & Personal Analysis'
-    d.text((118,H-105),footer,font=f_foot,fill=(101,119,145))
+    d.text((125,H-112),footer,font=f_foot,fill=(101,119,145))
     out=BytesIO(); im.save(out,format='PNG',optimize=True)
     return out.getvalue()
 
@@ -630,29 +836,52 @@ _learning_summary=learning_summary(learning_path)
 _learning_profile=learning_profile(learning_path)
 nums=[int(latest[f'n{i}']) for i in range(1,7)]; bonus=int(latest.bonus)
 
-st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45 <span class="v36-badge">v6.3 AURORA</span></div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
-if ss.get('ok') and status.get('complete_from_draw1'):
-    st.markdown(f'<div class="sync-ok"><span class="sync-icon">✅</span><span class="sync-main">전체 데이터 정상</span><span class="sync-detail">· 1회 ~ {status.get("max_draw")}회 · 연속성 확인</span></div>',unsafe_allow_html=True)
-elif not status.get('complete_from_draw1'):
-    st.markdown(f'<div class="sync-warn"><span class="sync-icon">⚠️</span><span class="sync-main">전체이력 복구 필요</span><span class="sync-detail">· 현재 {status.get("min_draw")}회 ~ {status.get("max_draw")}회만 보유 · 추천 잠금</span></div>',unsafe_allow_html=True)
-else:
-    st.markdown('<div class="sync-warn"><span class="sync-icon">⚠️</span><span class="sync-main">온라인 최신 확인 실패</span><span class="sync-detail">· 저장된 전체 검증 데이터를 사용 중입니다.</span></div>',unsafe_allow_html=True)
+_status_ok=bool(ss.get('ok') and status.get('complete_from_draw1'))
+_status_text='SYSTEM READY' if _status_ok else 'DATA CHECK'
+_status_class='live' if _status_ok else ''
+st.markdown(
+    f'''<div class="cmd-shell">
+      <div class="cmd-top">
+        <div class="cmd-brand">
+          <div class="cmd-logo">◈</div>
+          <div>
+            <div class="cmd-eyebrow">PREDICTIVE RESEARCH CONSOLE</div>
+            <div class="cmd-title">MD LOTTO <span>6/45</span></div>
+            <div class="cmd-sub">Adaptive Correction · Learning Loop · Integrated Simulation</div>
+          </div>
+        </div>
+        <div class="cmd-badge">V7.1 OFFICIAL</div>
+      </div>
+      <div class="cmd-status">
+        <div class="cmd-stat {_status_class}"><div class="lab">SYSTEM</div><div class="val">{_status_text}</div></div>
+        <div class="cmd-stat"><div class="lab">LATEST DRAW</div><div class="val">제 {int(latest.draw_no)}회</div></div>
+        <div class="cmd-stat"><div class="lab">HISTORY</div><div class="val">{len(df):,}회</div></div>
+        <div class="cmd-stat"><div class="lab">LAST DATE</div><div class="val">{latest.draw_date.strftime("%Y-%m-%d")}</div></div>
+      </div>
+    </div>''',unsafe_allow_html=True)
 
-st.markdown(f'<div class="section-head"><div class="section-title">🏆 제 {int(latest.draw_no)}회 최신 당첨번호</div><div class="date-chip">추첨일 {latest.draw_date.strftime("%Y-%m-%d")}</div></div>',unsafe_allow_html=True)
-st.markdown(balls_html(nums,bonus),unsafe_allow_html=True)
-st.markdown('<div class="legend"><span><i class="dot" style="background:#f2b400"></i>1-10</span><span><i class="dot" style="background:#1687ff"></i>11-20</span><span><i class="dot" style="background:#ed3547"></i>21-30</span><span><i class="dot" style="background:#9da2aa"></i>31-40</span><span><i class="dot" style="background:#38b44b"></i>41-45</span><span><i class="dot" style="background:#ed3547"></i>보너스</span></div>',unsafe_allow_html=True)
+if not status.get('complete_from_draw1'):
+    st.warning(f"전체이력 복구 필요 · 현재 {status.get('min_draw')}~{status.get('max_draw')}회만 보유 · 추천 잠금")
+elif not ss.get('ok'):
+    st.warning('온라인 최신 확인 실패 · 저장된 전체 검증 데이터를 사용 중입니다.')
 
-st.markdown(f'<div class="kpi-grid"><div class="kpi"><div class="kpi-label">📊 분석 회차</div><div class="kpi-value">{len(df):,}</div><div class="kpi-sub">총 분석 데이터</div></div><div class="kpi purple"><div class="kpi-label">🗓️ 최신 회차</div><div class="kpi-value">{int(latest.draw_no)}회</div><div class="kpi-sub">가장 최근 회차</div></div><div class="kpi red"><div class="kpi-label">📅 최신 추첨일</div><div class="kpi-value redv" style="font-size:1.28rem">{latest.draw_date.strftime("%Y-%m-%d")}</div><div class="kpi-sub">자동 동기화 기준</div></div></div>',unsafe_allow_html=True)
+st.markdown(
+    f'''<div class="draw-stage">
+      <div class="draw-stage-head">
+        <div><div class="draw-stage-kicker">LATEST OFFICIAL RESULT</div><div class="draw-stage-title">제 {int(latest.draw_no)}회 최신 당첨번호</div></div>
+        <div class="draw-stage-date">{latest.draw_date.strftime("%Y-%m-%d")}</div>
+      </div>
+      {balls_html(nums,bonus)}
+    </div>''',unsafe_allow_html=True)
 
-st.markdown('<div class="week-flow-title">🧭 이번 주 사용 순서</div>'
-            '<div class="week-flow">'
-            '<div class="week-step active"><div class="num">1</div><div class="name">데이터 확인</div><div class="desc">상단 전체 데이터 정상 여부 확인</div></div>'
-            '<div class="week-step"><div class="num">2</div><div class="name">기본 5조합</div><div class="desc">번호 추천 탭에서 우선순위 생성</div></div>'
-            '<div class="week-step"><div class="num">3</div><div class="name">통합 시뮬레이션</div><div class="desc">후보 조합을 다시 경쟁·최적화</div></div>'
-            '<div class="week-step"><div class="num">4</div><div class="name">다음 추첨 후 동기화</div><div class="desc">실제 결과 비교·누적 학습 저장</div></div>'
-            '</div>',unsafe_allow_html=True)
+st.markdown(
+    '''<div class="command-grid">
+      <div class="command-card hot"><div class="no">STEP 01</div><div class="ttl">차기회차 보정</div><div class="txt">지난 결과·FDR·백테스트·AI 검증을 내부 종합해 다음 전략을 먼저 보정</div></div>
+      <div class="command-card"><div class="no">STEP 02</div><div class="ttl">최종 5조합 생성</div><div class="txt">보정된 후보군으로 5조합을 한 화면에 압축 제시</div></div>
+      <div class="command-card"><div class="no">STEP 03</div><div class="ttl">통합 최적화</div><div class="txt">반복 시뮬레이션 후 최종 조합을 다시 경쟁·선별</div></div>
+    </div>''',unsafe_allow_html=True)
 
-with st.expander('📘 상세 사용 순서 보기',expanded=False):
+with st.expander('📘 사용 순서 자세히 보기',expanded=False):
     st.markdown('''
 **① 앱 실행 → 데이터 상태 확인**  
 맨 위가 `전체 데이터 정상`인지 먼저 봅니다. 정상이 아니면 다른 기능을 실행하지 말고 사이드바의 `🔄 지금 최신 데이터 확인`을 누릅니다.
@@ -844,7 +1073,7 @@ with tabs[2]:
                         'target_draw':int(latest.draw_no)+1,
                         'created_from_draw':int(latest.draw_no),
                         'games':[list(map(int,c)) for c in st.session_state['md_games'].combo.tolist()],
-                        'mode':'V6_3_AURORA_FINAL5_PRIORITY5'
+                        'mode':'V7_1_OFFICIAL_BALL_PRIORITY5'
                     }
                     record_recommendation(
                         learning_path,
@@ -867,7 +1096,9 @@ with tabs[2]:
             _display_games=[list(map(int,g)) for g in games.combo.tolist()]
             _target_draw=int(latest.draw_no)+1
             st.markdown(final_five_board_html(_display_games,_target_draw,'우선순위 5조합'),unsafe_allow_html=True)
-            _img=recommendation_image_bytes(_display_games,_target_draw,int(latest.draw_no))
+            st.markdown('''<div class="legend"><span><i class="dot" style="background:#FFD000"></i>1-10 노랑</span><span><i class="dot" style="background:#1687F8"></i>11-20 파랑</span><span><i class="dot" style="background:#F3262E"></i>21-30 빨강</span><span><i class="dot" style="background:#363D45"></i>31-40 검정/회색</span><span><i class="dot" style="background:#20B956"></i>41-45 초록</span></div>''',unsafe_allow_html=True)
+            _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
+            _img=recommendation_image_bytes(_display_games,_target_draw,int(latest.draw_no),_target_date)
             st.download_button(
                 '🖼️ 5조합 이미지(PNG) 다운로드',
                 data=_img,
@@ -928,7 +1159,9 @@ with tabs[2]:
             _final_games=[list(map(int,g)) for g in _so['selected_games']]
             _target_draw=int(latest.draw_no)+1
             st.markdown(final_five_board_html(_final_games,_target_draw,'통합 분석 최종 5조합'),unsafe_allow_html=True)
-            _final_img=recommendation_image_bytes(_final_games,_target_draw,int(latest.draw_no))
+            st.markdown('''<div class="legend"><span><i class="dot" style="background:#FFD000"></i>1-10 노랑</span><span><i class="dot" style="background:#1687F8"></i>11-20 파랑</span><span><i class="dot" style="background:#F3262E"></i>21-30 빨강</span><span><i class="dot" style="background:#363D45"></i>31-40 검정/회색</span><span><i class="dot" style="background:#20B956"></i>41-45 초록</span></div>''',unsafe_allow_html=True)
+            _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
+            _final_img=recommendation_image_bytes(_final_games,_target_draw,int(latest.draw_no),_target_date)
             st.download_button(
                 '🖼️ 최종 5조합 이미지(PNG) 다운로드',
                 data=_final_img,
@@ -1008,4 +1241,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-st.caption('MD LOTTO 6/45 · v6.3 Aurora Glass · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+st.caption('MD LOTTO 6/45 · v7.0 Obsidian Command · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

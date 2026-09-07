@@ -136,7 +136,7 @@ def _ball_rgb(n):
     if n<=40:return (49,54,60)
     return (32,185,86)
 
-def _draw_signature_ball(d,cx,cy,n,font):
+def _draw_signature_ball(d,cx,cy,n,font=None):
     # FINAL APPROVED BALL: a true glossy COLORED SPHERE with a smaller white
     # number medallion.  This intentionally avoids the old thick donut/ring look.
     n=int(n); rgb=_ball_rgb(n); R=54
@@ -159,13 +159,20 @@ def _draw_signature_ball(d,cx,cy,n,font):
 
     # white centre medallion is deliberately smaller than before (old ir=33),
     # so the ball reads as a 3-D sphere rather than a colored ring.
-    ir=25
+    ir=29
     d.ellipse((cx-ir-2,cy-ir-1,cx+ir+3,cy+ir+4),fill=dark)
     d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(253,253,251),outline=(232,232,229),width=2)
     d.ellipse((cx-ir+5,cy-ir+4,cx+ir-8,cy-ir+12),fill=(255,255,255))
 
-    s=str(n); bb=d.textbbox((0,0),s,font=font); tw=bb[2]-bb[0]; th=bb[3]-bb[1]
-    d.text((cx-tw/2,cy-th/2-5),s,font=font,fill=(10,10,10))
+    # Mobile-readable number: size is selected per digit count, not inherited from the board.
+    # This is intentionally large so the number remains legible after the 1536px board
+    # is scaled down to a ~650px-wide phone screen.
+    s=str(n)
+    num_font=_pick_font(46 if n < 10 else 35, True)
+    bb=d.textbbox((0,0),s,font=num_font)
+    tw=bb[2]-bb[0]; th=bb[3]-bb[1]
+    # textbbox has font-specific top bearing; anchor='mm' gives stable optical centering.
+    d.text((cx,cy-1),s,font=num_font,fill=(0,0,0),anchor='mm',stroke_width=1,stroke_fill=(0,0,0))
 
 
 def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):
@@ -214,7 +221,7 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None)
     # large white center disc, and bold black number.
     centers_x=[428,618,808,998,1188,1378]
     centers_y=[300,430,560,690,820]
-    f_num=_pick_font(34,True)
+    f_num=None  # number font is chosen inside _draw_signature_ball for 1/2-digit readability
     for g,cy in zip(games,centers_y):
         for cx,n in zip(centers_x,g):
             n=int(n)

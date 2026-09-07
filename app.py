@@ -137,27 +137,35 @@ def _ball_rgb(n):
     return (32,185,86)
 
 def _draw_signature_ball(d,cx,cy,n,font):
-    n=int(n); rgb=_ball_rgb(n); R=56
-    # soft oval shadow like the approved reference
-    d.ellipse((cx-43,cy+47,cx+43,cy+69),fill=(125,128,132))
-    # multi-layer glossy sphere
-    dark=tuple(max(0,int(c*.42)) for c in rgb)
-    mid=tuple(max(0,min(255,int(c*.78))) for c in rgb)
-    light=tuple(max(0,min(255,int(c*1.13+14))) for c in rgb)
-    d.ellipse((cx-R,cy-R,cx+R,cy+R),fill=dark,outline=(255,255,255),width=2)
-    d.ellipse((cx-R+5,cy-R+4,cx+R-4,cy+R-5),fill=mid)
-    d.ellipse((cx-R+11,cy-R+8,cx+R-10,cy+R-11),fill=rgb)
-    # large upper-left highlight
-    d.ellipse((cx-R+15,cy-R+10,cx-2,cy-13),fill=light)
-    d.ellipse((cx-R+22,cy-R+12,cx-17,cy-R+31),fill=(255,255,255))
-    # dark lower-right contour
-    d.arc((cx-R+4,cy-R+4,cx+R-4,cy+R-4),182,342,fill=dark,width=8)
-    # white center disk -- exact approved look
-    ir=33
-    d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(250,250,248),outline=(221,223,225),width=2)
-    d.ellipse((cx-ir+6,cy-ir+5,cx+ir-12,cy-ir+18),fill=(255,255,255))
+    # FINAL APPROVED BALL: a true glossy COLORED SPHERE with a smaller white
+    # number medallion.  This intentionally avoids the old thick donut/ring look.
+    n=int(n); rgb=_ball_rgb(n); R=54
+    dark=tuple(max(0,int(c*.34)) for c in rgb)
+    shade=tuple(max(0,int(c*.62)) for c in rgb)
+    bright=tuple(min(255,int(c*1.08+12)) for c in rgb)
+
+    # detached soft shadow
+    d.ellipse((cx-42,cy+43,cx+45,cy+62),fill=(151,154,158))
+
+    # full colored sphere, built as nested offset discs for depth
+    d.ellipse((cx-R,cy-R,cx+R,cy+R),fill=dark)
+    d.ellipse((cx-R+3,cy-R+2,cx+R-5,cy+R-6),fill=shade)
+    d.ellipse((cx-R+7,cy-R+5,cx+R-10,cy+R-11),fill=rgb)
+    # broad light area at upper-left; leaves a visibly colored body around center
+    d.ellipse((cx-R+11,cy-R+8,cx+17,cy+5),fill=bright)
+    d.ellipse((cx-R+17,cy-R+12,cx-15,cy-R+20),fill=(255,255,255))
+    d.arc((cx-R+5,cy-R+5,cx+R-5,cy+R-5),35,155,fill=(255,255,255),width=3)
+    d.arc((cx-R+4,cy-R+4,cx+R-4,cy+R-4),185,335,fill=dark,width=7)
+
+    # white centre medallion is deliberately smaller than before (old ir=33),
+    # so the ball reads as a 3-D sphere rather than a colored ring.
+    ir=25
+    d.ellipse((cx-ir-2,cy-ir-1,cx+ir+3,cy+ir+4),fill=dark)
+    d.ellipse((cx-ir,cy-ir,cx+ir,cy+ir),fill=(253,253,251),outline=(232,232,229),width=2)
+    d.ellipse((cx-ir+5,cy-ir+4,cx+ir-8,cy-ir+12),fill=(255,255,255))
+
     s=str(n); bb=d.textbbox((0,0),s,font=font); tw=bb[2]-bb[0]; th=bb[3]-bb[1]
-    d.text((cx-tw/2,cy-th/2-5),s,font=font,fill=(0,0,0))
+    d.text((cx-tw/2,cy-th/2-5),s,font=font,fill=(10,10,10))
 
 
 def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None):
@@ -206,13 +214,13 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None)
     # large white center disc, and bold black number.
     centers_x=[428,618,808,998,1188,1378]
     centers_y=[300,430,560,690,820]
-    f_num=_pick_font(47,True)
+    f_num=_pick_font(34,True)
     for g,cy in zip(games,centers_y):
         for cx,n in zip(centers_x,g):
             n=int(n)
             # Cover the sample ball embedded in the static board. The replacement
             # ball is then drawn entirely by the locked renderer below.
-            d.ellipse((cx-64,cy-64,cx+64,cy+70),fill=(242,244,247))
+            d.ellipse((cx-61,cy-61,cx+61,cy+66),fill=(242,244,247))
             _draw_signature_ball(d,cx,cy,n,f_num)
 
     out=BytesIO(); base.save(out,format='PNG',optimize=True)

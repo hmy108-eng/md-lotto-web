@@ -1,4 +1,4 @@
-# MD LOTTO v6.2 ADAPTIVE CORRECTION - SIMPLIFIED UI
+# MD LOTTO v6.3 AURORA GLASS - PREMIUM FINAL5
 # Upload only this file and requirements.txt to GitHub/Streamlit Community Cloud.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -26,6 +26,8 @@ from xml.sax.saxutils import escape as _xml_escape
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
 from md_lotto.data import load_csv,sync_history,save_sqlite,dataset_status,save_sync_status,load_sync_status
 from md_lotto.data import sync_incremental_official
 from md_lotto.stats import number_stats,pair_stats,triple_stats,structure_summary,randomness_audit,fdr_summary
@@ -175,6 +177,77 @@ box-shadow:inset 0 1px 2px rgba(255,255,255,.25),inset 0 -2px 4px rgba(0,0,0,.30
   .week-step .name{font-size:.88rem}
   .week-step .desc{font-size:.69rem}
 }
+
+/* v6.3 AURORA GLASS — visual redesign */
+:root{--aurora:#70d7ff;--aurora2:#9f7cff;--glass:rgba(12,20,38,.76);--glass2:rgba(18,29,52,.68)}
+.stApp{
+ background:
+ radial-gradient(circle at 8% 4%,rgba(57,183,255,.18),transparent 24%),
+ radial-gradient(circle at 92% 8%,rgba(141,91,255,.16),transparent 26%),
+ radial-gradient(circle at 50% 100%,rgba(18,89,165,.13),transparent 30%),
+ linear-gradient(155deg,#030711 0%,#07101e 45%,#040812 100%)!important;
+}
+.block-container{max-width:1180px!important;padding-top:.7rem!important}
+.hero-shell{
+ border:1px solid rgba(139,205,255,.25)!important;border-radius:28px!important;
+ padding:1.55rem 1.6rem 1.3rem!important;
+ background:linear-gradient(135deg,rgba(15,31,57,.92),rgba(8,16,32,.88))!important;
+ box-shadow:0 22px 60px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.07)!important;
+}
+.brand-title{letter-spacing:-.035em!important}
+.v36-badge{background:linear-gradient(90deg,#5fcaff,#9c7cff)!important;color:#06101d!important;border:none!important;font-weight:950!important}
+[data-testid="stTabs"] [data-baseweb="tab-list"]{
+ gap:.38rem;background:rgba(8,16,31,.72);padding:.38rem;border:1px solid rgba(113,166,225,.18);
+ border-radius:18px;backdrop-filter:blur(16px)
+}
+[data-testid="stTabs"] button[role="tab"]{
+ border-radius:13px!important;padding:.62rem .85rem!important;font-weight:850!important
+}
+[data-testid="stTabs"] button[aria-selected="true"]{
+ background:linear-gradient(135deg,rgba(51,156,255,.25),rgba(131,94,255,.23))!important;
+ box-shadow:inset 0 0 0 1px rgba(124,196,255,.25)
+}
+div.stButton>button,div.stDownloadButton>button{
+ min-height:52px!important;border-radius:15px!important;border:1px solid rgba(125,193,255,.30)!important;
+ background:linear-gradient(135deg,#1479df 0%,#4d63dc 55%,#7656cf 100%)!important;
+ color:white!important;font-weight:900!important;letter-spacing:-.01em!important;
+ box-shadow:0 10px 28px rgba(30,91,190,.25),inset 0 1px rgba(255,255,255,.18)!important;
+ transition:transform .18s ease,box-shadow .18s ease!important
+}
+div.stButton>button:hover,div.stDownloadButton>button:hover{
+ transform:translateY(-1px);box-shadow:0 14px 34px rgba(42,112,224,.34),inset 0 1px rgba(255,255,255,.22)!important
+}
+[data-testid="stMetric"],.game-card{
+ background:linear-gradient(145deg,rgba(15,27,49,.88),rgba(8,15,29,.82))!important;
+ border:1px solid rgba(114,169,229,.18)!important;border-radius:18px!important;
+ box-shadow:0 12px 30px rgba(0,0,0,.18)!important
+}
+.final-board{
+ position:relative;overflow:hidden;margin:.8rem 0 1rem;padding:1.15rem 1.15rem 1rem;border-radius:24px;
+ border:1px solid rgba(117,197,255,.26);
+ background:linear-gradient(145deg,rgba(16,31,57,.96),rgba(7,14,28,.96));
+ box-shadow:0 18px 48px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.07)
+}
+.final-board:before{content:"";position:absolute;inset:-80px auto auto -80px;width:210px;height:210px;border-radius:50%;background:rgba(55,180,255,.11);filter:blur(18px)}
+.final-head{position:relative;display:flex;justify-content:space-between;gap:.7rem;align-items:flex-end;margin-bottom:.85rem}
+.final-kicker{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:#78d5ff}
+.final-title{font-size:1.32rem;font-weight:950;letter-spacing:-.035em;color:#fff}
+.final-draw{font-size:.76rem;color:#9cadc4;border:1px solid #293b58;border-radius:999px;padding:.35rem .6rem}
+.final-grid{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.52rem}
+.final-line{background:rgba(5,12,24,.68);border:1px solid rgba(99,150,208,.18);border-radius:16px;padding:.65rem .45rem .7rem;text-align:center}
+.final-rank{font-size:.72rem;font-weight:900;color:#9eb0c7;margin-bottom:.5rem}
+.final-line .lotto-row{gap:.22rem;justify-content:center;flex-wrap:nowrap}
+.final-line .ball{width:35px;height:35px;min-width:35px}
+.final-line .ball-num{font-size:.82rem}
+.action-strip{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:.45rem 0 .9rem}
+@media(max-width:900px){
+ .final-grid{grid-template-columns:1fr}
+ .final-line{display:grid;grid-template-columns:54px 1fr;align-items:center;padding:.55rem .6rem}
+ .final-rank{margin:0;text-align:left}
+ .final-line .lotto-row{justify-content:flex-start;gap:.34rem}
+ .final-line .ball{width:39px;height:39px;min-width:39px}
+ .action-strip{grid-template-columns:1fr}
+}
 </style>
 """,unsafe_allow_html=True)
 
@@ -183,6 +256,81 @@ def balls_html(nums,bonus=None):
     parts=[f'<span class="ball {ball_class(int(n))}"><span class="ball-num">{int(n)}</span></span>' for n in nums]
     if bonus is not None: parts += ['<span class="bonus-label">+</span>',f'<span class="ball {ball_class(int(bonus))} bonus"><span class="ball-num">{int(bonus)}</span></span>']
     return '<div class="lotto-row">'+''.join(parts)+'</div>'
+
+def final_five_board_html(games,target_draw,title='MD LOTTO FINAL 5'):
+    rows=[]
+    for i,g in enumerate(games,1):
+        rows.append(
+            f'<div class="final-line"><div class="final-rank">{i}순위</div>{balls_html(g)}</div>'
+        )
+    return (
+        '<div class="final-board">'
+        '<div class="final-head"><div><div class="final-kicker">ADAPTIVE CORRECTION · FINAL SELECTION</div>'
+        f'<div class="final-title">{title}</div></div>'
+        f'<div class="final-draw">제 {int(target_draw)}회</div></div>'
+        f'<div class="final-grid">{"".join(rows)}</div></div>'
+    )
+
+def _pick_font(size,bold=False):
+    candidates=[
+        '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc' if bold else '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+        '/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc' if bold else '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+    ]
+    for fp in candidates:
+        try:
+            return ImageFont.truetype(fp,size=size)
+        except Exception:
+            pass
+    return ImageFont.load_default()
+
+def _ball_rgb(n):
+    n=int(n)
+    if n<=10:return (244,183,30)
+    if n<=20:return (45,143,244)
+    if n<=30:return (239,77,91)
+    if n<=40:return (139,149,165)
+    return (63,181,91)
+
+def recommendation_image_bytes(games,target_draw,basis_draw=None):
+    W,H=1400,900
+    im=Image.new('RGB',(W,H),(5,10,20))
+    d=ImageDraw.Draw(im)
+    # premium layered background
+    for y in range(H):
+        a=y/(H-1)
+        c=(int(5+5*a),int(10+8*a),int(20+17*a))
+        d.line((0,y,W,y),fill=c)
+    d.ellipse((-180,-230,470,420),fill=(10,48,83))
+    d.ellipse((1020,-170,1570,380),fill=(45,28,84))
+    d.rounded_rectangle((72,64,W-72,H-64),radius=42,fill=(9,18,34),outline=(47,84,126),width=2)
+    f_k=_pick_font(25,True); f_t=_pick_font(52,True); f_s=_pick_font(24,False)
+    f_r=_pick_font(25,True); f_n=_pick_font(27,True); f_foot=_pick_font(20,False)
+    d.text((118,105),'MD LOTTO · ADAPTIVE CORRECTION',font=f_k,fill=(103,210,255))
+    d.text((118,148),'FINAL 5',font=f_t,fill=(247,250,255))
+    d.text((118,215),f'제 {int(target_draw)}회 최종 추천 조합',font=f_s,fill=(169,184,205))
+    if basis_draw is not None:
+        txt=f'분석 기준: 제 {int(basis_draw)}회'
+        box=d.textbbox((0,0),txt,font=f_s)
+        d.text((W-118-(box[2]-box[0]),166),txt,font=f_s,fill=(145,160,184))
+    y0=292
+    ball_r=34
+    for idx,g in enumerate(games,1):
+        y=y0+(idx-1)*102
+        d.rounded_rectangle((118,y-15,W-118,y+70),radius=22,fill=(12,25,45),outline=(35,61,91),width=2)
+        d.text((148,y+10),f'{idx}',font=f_r,fill=(120,210,255))
+        x=270
+        for n in g:
+            rgb=_ball_rgb(n)
+            d.ellipse((x,y-1,x+ball_r*2,y-1+ball_r*2),fill=rgb,outline=(255,255,255),width=2)
+            s=str(int(n)); bb=d.textbbox((0,0),s,font=f_n)
+            d.text((x+ball_r-(bb[2]-bb[0])/2,y-1+ball_r-(bb[3]-bb[1])/2-2),s,font=f_n,fill=(255,255,255))
+            x+=112
+    footer='MD LOTTO 6/45 · Research & Personal Analysis'
+    d.text((118,H-105),footer,font=f_foot,fill=(101,119,145))
+    out=BytesIO(); im.save(out,format='PNG',optimize=True)
+    return out.getvalue()
+
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
     except:return '-'
@@ -482,7 +630,7 @@ _learning_summary=learning_summary(learning_path)
 _learning_profile=learning_profile(learning_path)
 nums=[int(latest[f'n{i}']) for i in range(1,7)]; bonus=int(latest.bonus)
 
-st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45 <span class="v36-badge">v6.2 ADAPTIVE</span></div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
+st.markdown('<div class="hero-shell"><div class="brand-row"><div class="brand-target">🎯</div><div class="brand-title">MD LOTTO 6/45 <span class="v36-badge">v6.3 AURORA</span></div></div><div class="brand-sub">과거 데이터·확률·조합 최적화를 연구하는 개인용 분석 도구</div></div>',unsafe_allow_html=True)
 if ss.get('ok') and status.get('complete_from_draw1'):
     st.markdown(f'<div class="sync-ok"><span class="sync-icon">✅</span><span class="sync-main">전체 데이터 정상</span><span class="sync-detail">· 1회 ~ {status.get("max_draw")}회 · 연속성 확인</span></div>',unsafe_allow_html=True)
 elif not status.get('complete_from_draw1'):
@@ -675,7 +823,7 @@ with tabs[2]:
             for _line in _adj.get('actions',[]): st.write('→ '+_line)
             _cg=_tr.get('current_consecutive_gap',0); _ag=_tr.get('historical_consecutive_avg_gap')
             if pd.notna(_ag): st.caption(f"연속수 과거 평균 출현간격 약 {_ag:.1f}회 · 현재 연속수 미출현 간격 {_cg}회")
-    subt=st.tabs(['추천 조합','번호 분석','시뮬레이션'])
+    subt=st.tabs(['🎯 최종 5조합','🧠 통합 최적화'])
     with subt[0]:
         st.info('차기회차 보정전략을 먼저 적용한 뒤 전체 과거패턴·최근 변화·연속수 주기·유사상태 흐름을 종합해 5조합만 제시합니다. 보정전략이 없으면 추천 버튼을 누를 때 자동 계산합니다.')
         if st.button('🎯 이번 회차 우선순위 5조합 만들기',type='primary',use_container_width=True):
@@ -696,7 +844,7 @@ with tabs[2]:
                         'target_draw':int(latest.draw_no)+1,
                         'created_from_draw':int(latest.draw_no),
                         'games':[list(map(int,c)) for c in st.session_state['md_games'].combo.tolist()],
-                        'mode':'V6_2_ADAPTIVE_CORRECTION_PRIORITY5'
+                        'mode':'V6_3_AURORA_FINAL5_PRIORITY5'
                     }
                     record_recommendation(
                         learning_path,
@@ -716,22 +864,21 @@ with tabs[2]:
             games=None
             st.info('새 당첨회차가 반영되어 이전 추천은 자동 폐기했습니다. 이번 회차 기준으로 다시 생성해 주세요.')
         if games is not None and len(games):
-            for i,row in games.iterrows():
-                _scenario=str(row.get('scenario',f'{i+1}순위'))
-                _reason=str(row.get('reason','전체 패턴 종합'))
-                st.markdown(
-                    f'<div class="game-card"><div class="game-title">{int(row.get("rank",i+1))}순위 · {_scenario} '
-                    f'<span class="md-score">· 종합평가 {float(row.get("priority_score",0)):.1f}</span></div>'
-                    f'{balls_html(row.combo)}'
-                    f'<div class="small-note">{_reason}</div></div>',
-                    unsafe_allow_html=True
-                )
-            st.caption(f"분석 후보 조합 수: {int(games.attrs.get('evaluated_combinations',0)):,}개 · 최종 제안은 5조합")
-            st.caption('※ 순위는 과거 패턴을 참고한 프로그램 내부 우선순위이며 실제 당첨확률 순위가 아닙니다.')
-        else: st.info('「이번 회차 우선순위 5조합 만들기」를 누르세요.')
+            _display_games=[list(map(int,g)) for g in games.combo.tolist()]
+            _target_draw=int(latest.draw_no)+1
+            st.markdown(final_five_board_html(_display_games,_target_draw,'우선순위 5조합'),unsafe_allow_html=True)
+            _img=recommendation_image_bytes(_display_games,_target_draw,int(latest.draw_no))
+            st.download_button(
+                '🖼️ 5조합 이미지(PNG) 다운로드',
+                data=_img,
+                file_name=f'MD_LOTTO_{_target_draw}_FINAL5.png',
+                mime='image/png',
+                use_container_width=True
+            )
+            st.caption('5조합 전체를 한 화면에 표시합니다. 개별 조합 설명은 제거했습니다.')
+        else:
+            st.info('「이번 회차 우선순위 5조합 만들기」를 누르세요.')
     with subt[1]:
-        view=ns[['number','count_all','count_20','count_50','count_100','count_300','current_gap','mean_gap','z_score']].copy(); view.columns=['번호','전체','최근20','최근50','최근100','최근300','현재 미출현','평균 간격','Z-score']; st.dataframe(view,use_container_width=True,hide_index=True); st.caption('Hot/Cold와 Gap은 과거 상태를 설명할 뿐 “나올 차례”를 의미하지 않습니다.')
-    with subt[2]:
         _tb=five_ticket_threeplus_theoretical_bounds()
         st.info(f'목표: 5조합의 3개 이상 적중 커버리지를 가능한 한 높입니다. 하지만 5게임만으로는 수학적 한계가 있습니다. 단일 게임의 3개+ 확률은 약 {100*_tb["single_3plus"]:.2f}%이고, 5게임 전체의 3개+ 커버리지는 합집합 상한으로 최대 {100*_tb["max_5ticket_3plus_union_bound"]:.2f}%를 넘을 수 없습니다. 따라서 미당첨률 50% 이하는 5게임 조건에서는 불가능하며, 이론적 절대 하한도 약 {100*_tb["min_5ticket_miss_union_bound"]:.2f}%입니다.')
         if st.button('🧠 통합 최적화 시뮬레이션 실행',use_container_width=True,type='primary'):
@@ -778,9 +925,17 @@ with tabs[2]:
 
         _so=st.session_state.get('sim_optimizer_result')
         if _so:
-            st.markdown('### 🎯 통합 분석이 선택한 최종 5조합')
-            for _i,_g in enumerate(_so['selected_games'],1):
-                st.markdown(f'<div class="game-card"><div class="game-title">{_i}순위 · 통합 최적화</div>{balls_html(_g)}<div class="small-note">FDR·백테스트·AI 진단은 과적합 검증에 사용하고, 최종 선택은 반복 시뮬레이션의 3개+ 커버리지와 조합 분산을 기준으로 결정</div></div>',unsafe_allow_html=True)
+            _final_games=[list(map(int,g)) for g in _so['selected_games']]
+            _target_draw=int(latest.draw_no)+1
+            st.markdown(final_five_board_html(_final_games,_target_draw,'통합 분석 최종 5조합'),unsafe_allow_html=True)
+            _final_img=recommendation_image_bytes(_final_games,_target_draw,int(latest.draw_no))
+            st.download_button(
+                '🖼️ 최종 5조합 이미지(PNG) 다운로드',
+                data=_final_img,
+                file_name=f'MD_LOTTO_{_target_draw}_OPTIMIZED_FINAL5.png',
+                mime='image/png',
+                use_container_width=True
+            )
 
             _miss=100*_so['miss_rate_pattern']; _fairmiss=100*_so['miss_rate_fair']
             _c=st.columns(3)
@@ -853,4 +1008,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-st.caption('MD LOTTO 6/45 · v6.2 Adaptive Correction · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+st.caption('MD LOTTO 6/45 · v6.3 Aurora Glass · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

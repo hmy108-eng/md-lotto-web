@@ -14,9 +14,15 @@ if (not _marker.exists()) or (_marker.read_text(encoding="utf-8", errors="ignore
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_txt, encoding="utf-8")
     _marker.write_text(_RUNTIME_VERSION, encoding="utf-8")
-_sys.path.insert(0, str(_RUNTIME))
+_APP_ROOT = _Path(__file__).resolve().parent
+# A complete ZIP/repository must use its visible, updateable source modules.
+# The embedded runtime is only a fallback for legacy single-file deployments.
+_HAS_LOCAL_PACKAGE = (_APP_ROOT / "md_lotto" / "__init__.py").exists()
+if not _HAS_LOCAL_PACKAGE:
+    _sys.path.insert(0, str(_RUNTIME))
 import os as _os
-_os.environ.setdefault("MD_LOTTO_DATA_DIR", str(_RUNTIME / "data"))
+_default_data_dir = (_APP_ROOT / "data") if _HAS_LOCAL_PACKAGE else (_RUNTIME / "data")
+_os.environ.setdefault("MD_LOTTO_DATA_DIR", str(_default_data_dir))
 
 from pathlib import Path
 import os, threading, time, math
@@ -29,7 +35,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from xml.sax.saxutils import escape as _xml_escape
 import pandas as pd
 import streamlit as st
-MD_BUILD_ID = 'MD-LOTTO-v8.1.1-20260914-1225-KST'
+MD_BUILD_ID = 'MD-LOTTO-v8.2-QA-FIXED-20260914'
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
@@ -715,7 +721,7 @@ with st.sidebar:
     else:
         st.error(f"전체이력 미완료 · {status.get('min_draw')}~{status.get('max_draw')}회")
     st.caption('연속 전체이력 정상' if status.get('complete_from_draw1') else '추천 전 전체이력 복구가 필요합니다.')
-    if st.button('🔄 지금 최신 데이터 확인',use_container_width=True):
+    if st.button('🔄 지금 최신 데이터 확인',width='stretch'):
         with st.spinner('전체 회차와 최신 회차를 확인하는 중입니다...'):
             try:
                 _df,_st=sync_history(path,verify_official_count=2)
@@ -752,6 +758,36 @@ with tabs[0]:
                 st.caption(f"누적학습 보정 한도: 최대 {_learning_profile.get('max_bonus',2.0):.0f}점")
         else:
             st.info('추천 → 추첨 → 최신 전체이력 복구·동기화를 반복하면 사후평가가 자동 누적됩니다.')
+
+        _evaluated=[r for r in _learning_rows if r.get('evaluated')]
+        if _evaluated:
+            _last_eval=_evaluated[-1]
+            _actual=set(map(int,_last_eval.get('actual',[])))
+            _comparison=[]
+            for _idx,_game in enumerate(_last_eval.get('games',[]),1):
+                _pred=list(map(int,_game)); _matched=sorted(set(_pred)&_actual)
+                _comparison.append({
+                    '조합':f'{_idx}순위',
+                    '지난주 예상번호':' · '.join(map(str,_pred)),
+                    '일치번호':' · '.join(map(str,_matched)) if _matched else '없음',
+                    '일치수':len(_matched),
+                })
+            st.markdown(f"#### 제{int(_last_eval.get('target_draw',0))}회 예상번호 ↔ 실제 당첨 비교")
+            st.caption('실제 당첨번호: '+' · '.join(map(str,sorted(_actual))))
+            st.dataframe(pd.DataFrame(_comparison),width='stretch',hide_index=True)
+            _missed=list(map(int,_last_eval.get('missed_actual_numbers',[])))
+            _best=int(_last_eval.get('best_hits',0))
+            _diagnosis=('후보번호 선정 보완' if len(_missed)>=3 else
+                        '조합 배치 보완' if _best<3 else '현재 분산전략 유지')
+            st.markdown('#### 차이 진단과 이번 주 반영')
+            st.dataframe(pd.DataFrame([{
+                '최고 일치':f'{_best}개',
+                '5조합 전체에서 놓친 당첨번호':' · '.join(map(str,_missed)) if _missed else '없음',
+                '차이 진단':_diagnosis,
+                '이번 주 보완':'차기회차 보정 탭에서 최신 결과 반영 후 후보 Pool·조합 중복도를 자동 조정'
+            }]),width='stretch',hide_index=True)
+        else:
+            st.caption('지난주 추천 기록이 평가되면 이곳에 예상번호·실제번호·차이·이번 주 보완표가 자동 표시됩니다.')
     with _op_right:
         st.markdown('<div class="ops-title">📥 데이터 직접 검증</div>',unsafe_allow_html=True)
         if status.get('complete_from_draw1'):
@@ -762,7 +798,7 @@ with tabs[0]:
                 data=_audit_xlsx,
                 file_name=_xlsx_name,
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                use_container_width=True
+                width='stretch'
             )
             st.caption(f"1회~{int(status['max_draw'])}회 · 누락 없는 현재 분석 데이터")
         else:
@@ -784,7 +820,7 @@ with tabs[0]:
         st.info(f"최근 {_lr['previous_draw']}회→{_lr['current_draw']}회 변화: 직전번호 재등장 {int(_lr['current_features']['overlap_prev'])}개 · 연속수 {int(_lr['current_features']['consecutive_pairs'])}쌍 · 번호합 {int(_lr['previous_features']['sum'])}→{int(_lr['current_features']['sum'])}")
 
     _today=pd.Timestamp.now(tz='Asia/Seoul').tz_localize(None).normalize()
-    _one_year_ago=_today-pd.Timedelta(days=365)
+    _one_year_ago=_today-pd.DateOffset(years=1)
     _recent=df[(df['draw_date']>=_one_year_ago)&(df['draw_date']<=_today)].copy()
     _counts={n:0 for n in range(1,46)}
     for _,_r in _recent.iterrows():
@@ -797,11 +833,11 @@ with tabs[0]:
     _color_map={'1-10':'#FFD400','11-20':'#0F8DF5','21-30':'#F5232C','31-40':'#484E55','41-45':'#18B956'}
     fig=px.bar(_chart,x='번호',y='최근 1년 출현',color='번호대',color_discrete_map=_color_map,category_orders={'번호대':['1-10','11-20','21-30','31-40','41-45']},hover_data={'번호':True,'최근 1년 출현':True,'번호대':True})
     fig.update_layout(margin=dict(l=0,r=0,t=15,b=0),height=350,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',font_color='#aeb8c8',legend_title_text='번호대',xaxis=dict(dtick=1),yaxis_title='출현 횟수')
-    st.plotly_chart(fig,use_container_width=True)
+    st.plotly_chart(fig,width='stretch')
 with tabs[1]:
     st.subheader('🔄 차기회차 보정전략')
     st.caption('지난 추천과 실제 당첨결과의 차이, 최신 회차 변화, FDR·백테스트·AI 검증을 내부에서 종합해 다음 5조합 생성 전에 적용할 보정안을 만듭니다.')
-    if st.button('🔄 최신 결과 반영 · 보정전략 계산',type='primary',use_container_width=True):
+    if st.button('🔄 최신 결과 반영 · 보정전략 계산',type='primary',width='stretch'):
         with st.spinner('지난 결과 진단 → FDR → 백테스트 → AI 검증 → 차기회차 보정안 생성 중...'):
             _cp=_get_current_correction(force=True)
     else:
@@ -864,7 +900,7 @@ with tabs[2]:
         _rc[3].metric('최근 추세',str(_rr.get('trend_label','-')))
         _rdf=pd.DataFrame(_rr.get('rows',[]))
         if len(_rdf):
-            st.dataframe(_rdf.tail(12),use_container_width=True,hide_index=True)
+            st.dataframe(_rdf.tail(12),width='stretch',hide_index=True)
         st.caption(str(_rr.get('summary','')))
         st.caption('※ 후보군 적중은 5조합의 실제 당첨을 뜻하지 않습니다. 동일 크기 무작위 후보군의 기대값과 함께 표시하여 학습이 단순히 후보 수를 늘려 좋아 보이는 착시를 줄였습니다.')
     else:
@@ -872,7 +908,7 @@ with tabs[2]:
     subt=st.tabs(['🎯 최종 5조합','🧠 통합 최적화'])
     with subt[0]:
         st.info('차기회차 보정전략을 먼저 적용한 뒤 전체 과거패턴·최근 변화·연속수 주기·유사상태 흐름을 종합해 5조합만 제시합니다. 보정전략이 없으면 추천 버튼을 누를 때 자동 계산합니다.')
-        if st.button('🎯 이번 회차 우선순위 5조합 만들기',type='primary',use_container_width=True):
+        if st.button('🎯 이번 회차 우선순위 5조합 만들기',type='primary',width='stretch'):
             if not status.get('complete_from_draw1'):
                 st.error('전체 과거회차 데이터가 아직 복구되지 않았습니다. 21개 내장 Seed만으로는 패턴이 왜곡될 수 있어 추천을 중단합니다. 사이드바의 「지금 최신 데이터 확인」으로 전체 회차를 먼저 복구해 주세요.')
             else:
@@ -914,13 +950,13 @@ with tabs[2]:
             _target_draw=int(latest.draw_no)+1
             _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
             _img=recommendation_image_bytes(_display_games,_target_draw,int(latest.draw_no),_target_date)
-            st.image(_img,use_container_width=True,caption=f'제 {_target_draw}회 우선순위 최종 5조합')
+            st.image(_img,width='stretch',caption=f'제 {_target_draw}회 우선순위 최종 5조합')
             st.download_button(
                 '🖼️ 5조합 이미지(PNG) 다운로드',
                 data=_img,
                 file_name=f'MD_LOTTO_{_target_draw}_FINAL5.png',
                 mime='image/png',
-                use_container_width=True
+                width='stretch'
             )
             st.caption('5조합 전체를 한 화면에 표시합니다. 개별 조합 설명은 제거했습니다.')
         else:
@@ -928,7 +964,7 @@ with tabs[2]:
     with subt[1]:
         _tb=five_ticket_threeplus_theoretical_bounds()
         st.info(f'목표: 5조합의 3개 이상 적중 커버리지를 가능한 한 높입니다. 하지만 5게임만으로는 수학적 한계가 있습니다. 단일 게임의 3개+ 확률은 약 {100*_tb["single_3plus"]:.2f}%이고, 5게임 전체의 3개+ 커버리지는 합집합 상한으로 최대 {100*_tb["max_5ticket_3plus_union_bound"]:.2f}%를 넘을 수 없습니다. 따라서 미당첨률 50% 이하는 5게임 조건에서는 불가능하며, 이론적 절대 하한도 약 {100*_tb["min_5ticket_miss_union_bound"]:.2f}%입니다.')
-        if st.button('🧠 통합 최적화 시뮬레이션 실행',use_container_width=True,type='primary'):
+        if st.button('🧠 통합 최적화 시뮬레이션 실행',width='stretch',type='primary'):
             if not status.get('complete_from_draw1'):
                 st.error('전체 과거회차 복구 후 실행해 주세요.')
             else:
@@ -976,13 +1012,13 @@ with tabs[2]:
             _target_draw=int(latest.draw_no)+1
             _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
             _final_img=recommendation_image_bytes(_final_games,_target_draw,int(latest.draw_no),_target_date)
-            st.image(_final_img,use_container_width=True,caption=f'제 {_target_draw}회 통합 분석 최종 5조합')
+            st.image(_final_img,width='stretch',caption=f'제 {_target_draw}회 통합 분석 최종 5조합')
             st.download_button(
                 '🖼️ 최종 5조합 이미지(PNG) 다운로드',
                 data=_final_img,
                 file_name=f'MD_LOTTO_{_target_draw}_OPTIMIZED_FINAL5.png',
                 mime='image/png',
-                use_container_width=True
+                width='stretch'
             )
 
             _miss=100*_so['miss_rate_pattern']; _fairmiss=100*_so['miss_rate_fair']
@@ -1023,7 +1059,7 @@ with tabs[2]:
 with tabs[3]:
     st.subheader('✅ 종합 검증 결과')
     st.caption('FDR·백테스트·AI·지난 추천 오차분석은 내부에서 실행합니다. 여기서는 다음 회차 추천에 실제로 어떤 판단이 반영되는지만 간단히 보여줍니다.')
-    if st.button('✅ 종합 검증 새로 실행',use_container_width=True):
+    if st.button('✅ 종합 검증 새로 실행',width='stretch'):
         with st.spinner('내부 검증을 다시 계산하는 중...'):
             _vp=_get_current_correction(force=True)
     else:

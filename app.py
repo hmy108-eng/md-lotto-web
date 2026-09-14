@@ -467,6 +467,36 @@ def cached_recommendation_diagnostics(latest_draw, tests, games, sample_combos):
 def cached_mobile_ml_holdout(latest_draw):
     return train_evaluate(load_csv(path))
 
+@st.cache_data(show_spinner=False, max_entries=8)
+def cached_latest_hindsight_safe_comparison(latest_draw):
+    """Recreate the last prediction using only information available beforehand."""
+    _all=load_csv(path)
+    if len(_all)<301 or int(_all.iloc[-1].draw_no)!=int(latest_draw):
+        return None
+    _before=_all.iloc[:-1].copy()
+    _before_ns=number_stats(_before)
+    _before_adj=next_draw_adjustment_report(_before)
+    _correction={
+        'pool_size':20,'max_overlap':3,'max_bonus':2,
+        'profile':_before_adj.get('profile',{}),
+    }
+    _games=adaptive_priority_five(
+        _before,_before_ns,pool_size=20,max_overlap=3,
+        correction=_correction
+    )
+    _actual=[int(_all.iloc[-1][f'n{i}']) for i in range(1,7)]
+    _game_list=[list(map(int,c)) for c in _games.combo.tolist()]
+    _union={n for g in _game_list for n in g}
+    _hits=[len(set(g)&set(_actual)) for g in _game_list]
+    return {
+        'target_draw':int(latest_draw),
+        'created_from_draw':int(_before.iloc[-1].draw_no),
+        'games':_game_list,'actual':_actual,'game_hits':_hits,
+        'best_hits':max(_hits) if _hits else 0,
+        'missed_actual_numbers':[n for n in _actual if n not in _union],
+        'comparison_mode':'과거시점 자동 재현',
+    }
+
 
 def _build_integrated_correction():
     """Create the next-draw correction plan from last outcome + transition + FDR + backtest + AI.
@@ -760,8 +790,9 @@ with tabs[0]:
             st.info('추천 → 추첨 → 최신 전체이력 복구·동기화를 반복하면 사후평가가 자동 누적됩니다.')
 
         _evaluated=[r for r in _learning_rows if r.get('evaluated')]
-        if _evaluated:
-            _last_eval=_evaluated[-1]
+        _last_eval=(_evaluated[-1] if _evaluated else
+                    cached_latest_hindsight_safe_comparison(int(latest.draw_no)))
+        if _last_eval:
             _actual=set(map(int,_last_eval.get('actual',[])))
             _comparison=[]
             for _idx,_game in enumerate(_last_eval.get('games',[]),1):
@@ -773,21 +804,23 @@ with tabs[0]:
                     '일치수':len(_matched),
                 })
             st.markdown(f"#### 제{int(_last_eval.get('target_draw',0))}회 예상번호 ↔ 실제 당첨 비교")
+            if _last_eval.get('comparison_mode'):
+                st.caption(f"비교 방식: {_last_eval['created_from_draw']}회까지의 데이터만 사용한 {_last_eval['comparison_mode']}")
             st.caption('실제 당첨번호: '+' · '.join(map(str,sorted(_actual))))
             st.dataframe(pd.DataFrame(_comparison),width='stretch',hide_index=True)
             _missed=list(map(int,_last_eval.get('missed_actual_numbers',[])))
             _best=int(_last_eval.get('best_hits',0))
             _diagnosis=('후보번호 선정 보완' if len(_missed)>=3 else
                         '조합 배치 보완' if _best<3 else '현재 분산전략 유지')
-            st.markdown('#### 차이 진단과 이번 주 반영')
+            st.markdown(f"#### 차이 진단과 제{int(latest.draw_no)+1}회 반영")
             st.dataframe(pd.DataFrame([{
                 '최고 일치':f'{_best}개',
                 '5조합 전체에서 놓친 당첨번호':' · '.join(map(str,_missed)) if _missed else '없음',
                 '차이 진단':_diagnosis,
-                '이번 주 보완':'차기회차 보정 탭에서 최신 결과 반영 후 후보 Pool·조합 중복도를 자동 조정'
+                f'제{int(latest.draw_no)+1}회 보완':'놓친 번호대·후보 포함률과 조합 중복도를 보수적으로 재조정'
             }]),width='stretch',hide_index=True)
         else:
-            st.caption('지난주 추천 기록이 평가되면 이곳에 예상번호·실제번호·차이·이번 주 보완표가 자동 표시됩니다.')
+            st.warning('직전회차 자동 비교 계산을 준비하지 못했습니다. 전체이력 상태를 확인해 주세요.')
     with _op_right:
         st.markdown('<div class="ops-title">📥 데이터 직접 검증</div>',unsafe_allow_html=True)
         if status.get('complete_from_draw1'):
@@ -1084,4 +1117,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-st.caption('MD LOTTO 6/45 · v8.0 FINAL COMPLETE · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+        st.caption('MD LOTTO 6/45 · v8.2.1 COMPARISON FIX · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

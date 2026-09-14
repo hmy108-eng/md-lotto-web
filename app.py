@@ -25,7 +25,7 @@ _default_data_dir = (_APP_ROOT / "data") if _HAS_LOCAL_PACKAGE else (_RUNTIME / 
 _os.environ.setdefault("MD_LOTTO_DATA_DIR", str(_default_data_dir))
 
 from pathlib import Path
-import os, threading, time, math
+import os, threading, time, math, random
 from io import BytesIO
 
 # v7.4 Signature assets embedded from the user-approved visual reference.
@@ -467,6 +467,39 @@ def cached_recommendation_diagnostics(latest_draw, tests, games, sample_combos):
 def cached_mobile_ml_holdout(latest_draw):
     return train_evaluate(load_csv(path))
 
+def coverage_first_five(history_df, seed=None):
+    """Build five disjoint tickets; history is used only for a stable seed.
+
+    No past-number signal has demonstrated predictive edge, so this fallback
+    maximizes portfolio spread while keeping each ticket structurally ordinary.
+    """
+    draw_no=int(history_df.iloc[-1].draw_no)
+    rng=random.Random(int(seed if seed is not None else 645000+draw_no))
+    best=None
+    for _ in range(6000):
+        balls=list(range(1,46)); rng.shuffle(balls)
+        games=[tuple(sorted(balls[i*6:(i+1)*6])) for i in range(5)]
+        penalty=0.0
+        for g in games:
+            odd=sum(n%2 for n in g); low=sum(n<=22 for n in g)
+            buckets=len({(n-1)//10 for n in g}); total=sum(g)
+            consecutive=sum(b-a==1 for a,b in zip(g,g[1:]))
+            penalty += abs(total-138)/18 + abs(odd-3)*1.2 + abs(low-3)
+            penalty += max(0,3-buckets)*1.5 + max(0,consecutive-1)*1.2
+        if best is None or penalty<best[0]:
+            best=(penalty,games)
+    rows=[]
+    for i,g in enumerate(best[1],1):
+        rows.append({
+            'rank':i,'combo':g,'priority_score':100-best[0],
+            'reason':'검증 실패 신호 차단 · 5조합 번호중복 0개 · 전체 30개 번호 분산'
+        })
+    out=pd.DataFrame(rows)
+    out.attrs['mode']='coverage_first_disjoint'
+    out.attrs['unique_numbers']=30
+    out.attrs['max_overlap']=0
+    return out
+
 @st.cache_data(show_spinner=False, max_entries=8)
 def cached_latest_hindsight_safe_comparison(latest_draw):
     """Recreate the last prediction using only information available beforehand."""
@@ -474,16 +507,7 @@ def cached_latest_hindsight_safe_comparison(latest_draw):
     if len(_all)<301 or int(_all.iloc[-1].draw_no)!=int(latest_draw):
         return None
     _before=_all.iloc[:-1].copy()
-    _before_ns=number_stats(_before)
-    _before_adj=next_draw_adjustment_report(_before)
-    _correction={
-        'pool_size':20,'max_overlap':3,'max_bonus':2,
-        'profile':_before_adj.get('profile',{}),
-    }
-    _games=adaptive_priority_five(
-        _before,_before_ns,pool_size=20,max_overlap=3,
-        correction=_correction
-    )
+    _games=coverage_first_five(_before)
     _actual=[int(_all.iloc[-1][f'n{i}']) for i in range(1,7)]
     _game_list=[list(map(int,c)) for c in _games.combo.tolist()]
     _union={n for g in _game_list for n in g}
@@ -578,11 +602,17 @@ def _build_integrated_correction():
     bt_ok=bool(bt_sum.get('evidence_of_edge',False))
     ml_ok=bool(ml.get('available') and ml.get('beats_constant_logloss'))
     # Correction strength is deliberately bounded. Weak validation -> smaller influence.
-    max_bonus=4.0 if (bt_ok and ml_ok) else 3.0 if (bt_ok or ml_ok) else 2.0
+    predictive_edge=bool(bt_ok and ml_ok and (pair_sig+triple_sig)>0)
+    max_bonus=4.0 if predictive_edge else 0.0
     if not bt_ok:
         actions.append('백테스트에서 랜덤 대비 뚜렷한 우위 근거가 부족 → 보정 강도를 낮춤')
     if not ml_ok:
         actions.append('AI Holdout이 기본모델 우위를 확인하지 못함 → AI 신호는 가중치 강화에 사용하지 않음')
+    if not predictive_edge:
+        pool_size=30
+        max_overlap=0
+        failure_type='예측 우위 미확인 · 분산전략 전환'
+        actions.append('검증을 모두 통과하지 못해 패턴 가중치를 차단하고 5조합 30개 번호를 중복 없이 분산')
 
     return {
         'available':True,
@@ -596,11 +626,12 @@ def _build_integrated_correction():
         'max_overlap':max_overlap,
         'pair_scale':pair_scale,
         'max_bonus':max_bonus,
+        'strategy_mode':'pattern' if predictive_edge else 'coverage_first',
         'actions':actions[:6],
         'fdr_status':fdr_status,
         'backtest_status':'검증 통과' if bt_ok else '근거 부족',
         'ai_status':'검증 통과' if ml_ok else '보수 적용',
-        'overall_status':'보정 적용' if targets else '기본전략 유지',
+        'overall_status':'검증 통과 패턴전략' if predictive_edge else '분산 우선 안전모드',
         'evidence':{'fdr':fdr,'backtest':bt_sum,'ml':ml}
     }
 
@@ -947,19 +978,22 @@ with tabs[2]:
             else:
                 with st.spinner('과거 전체패턴과 최근 회차 변화까지 종합 분석하는 중...'):
                     _cp=_get_current_correction()
-                    _base_games=adaptive_priority_five(
-                        df,ns,
-                        pool_size=int(_cp.get('pool_size',20)),
-                        max_overlap=int(_cp.get('max_overlap',3)),
-                        correction=_cp
-                    )
+                    if _cp.get('strategy_mode')=='coverage_first':
+                        _base_games=coverage_first_five(df)
+                    else:
+                        _base_games=adaptive_priority_five(
+                            df,ns,
+                            pool_size=int(_cp.get('pool_size',20)),
+                            max_overlap=int(_cp.get('max_overlap',3)),
+                            correction=_cp
+                        )
                     st.session_state['md_games']=_base_games
                     _learning_profile=learning_profile(learning_path)
                     st.session_state['md_recommendation_record']={
                         'target_draw':int(latest.draw_no)+1,
                         'created_from_draw':int(latest.draw_no),
                         'games':[list(map(int,c)) for c in st.session_state['md_games'].combo.tolist()],
-                        'mode':'V7_8_1_DEPLOY_FIXED_PRIORITY5'
+                        'mode':'V8_3_EVIDENCE_GATED_COVERAGE5'
                     }
                     record_recommendation(
                         learning_path,
@@ -967,7 +1001,7 @@ with tabs[2]:
                         created_from_draw=int(latest.draw_no),
                         games=st.session_state['md_games'].combo.tolist(),
                         meta={
-                            'mode':'pattern_priority5',
+                            'mode':str(_cp.get('strategy_mode','coverage_first')),
                             'learning_profile':_learning_profile
                         }
                     )
@@ -981,7 +1015,7 @@ with tabs[2]:
         if games is not None and len(games):
             _display_games=[list(map(int,g)) for g in games.combo.tolist()]
             _target_draw=int(latest.draw_no)+1
-            _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
+            _target_date=pd.Timestamp(latest.draw_date)+pd.DateOffset(days=7)
             _img=recommendation_image_bytes(_display_games,_target_draw,int(latest.draw_no),_target_date)
             st.image(_img,width='stretch',caption=f'제 {_target_draw}회 우선순위 최종 5조합')
             st.download_button(
@@ -1015,14 +1049,22 @@ with tabs[2]:
                         'ml':_ml,
                     }
                     _cp=_get_current_correction()
-                    _batches=[]
-                    for _n in (24,36,48):
-                        _cdf=corrected_candidate_games(
-                            df,ns,correction=_cp,limit=_n,
-                            pool_size=max(22,int(_cp.get('pool_size',20)))
+                    if _cp.get('strategy_mode')=='coverage_first':
+                        _batches=[coverage_first_five(df).combo.tolist()]
+                        _simopt=converge_min_miss_portfolio(
+                            _batches,ns,stages=(10000,25000,50000),max_overlap=0
                         )
-                        _batches.append(_cdf.combo.tolist())
-                    _simopt=converge_min_miss_portfolio(_batches,ns,stages=(10000,25000,50000),max_overlap=3)
+                    else:
+                        _batches=[]
+                        for _n in (24,36,48):
+                            _cdf=corrected_candidate_games(
+                                df,ns,correction=_cp,limit=_n,
+                                pool_size=max(22,int(_cp.get('pool_size',20)))
+                            )
+                            _batches.append(_cdf.combo.tolist())
+                        _simopt=converge_min_miss_portfolio(
+                            _batches,ns,stages=(10000,25000,50000),max_overlap=3
+                        )
                     _simopt['evidence']=_evidence
                     st.session_state['sim_optimizer_result']=_simopt
                     record_recommendation(
@@ -1043,7 +1085,7 @@ with tabs[2]:
         if _so:
             _final_games=[list(map(int,g)) for g in _so['selected_games']]
             _target_draw=int(latest.draw_no)+1
-            _target_date=pd.Timestamp(latest.draw_date)+pd.Timedelta(days=7)
+            _target_date=pd.Timestamp(latest.draw_date)+pd.DateOffset(days=7)
             _final_img=recommendation_image_bytes(_final_games,_target_draw,int(latest.draw_no),_target_date)
             st.image(_final_img,width='stretch',caption=f'제 {_target_draw}회 통합 분석 최종 5조합')
             st.download_button(
@@ -1117,4 +1159,4 @@ with tabs[3]:
     else:
         st.info('아직 이번 회차 기준 종합 검증이 없습니다. 차기회차 보정 메뉴에서 계산하거나 번호 추천을 실행하면 자동 생성됩니다.')
 
-        st.caption('MD LOTTO 6/45 · v8.2.1 COMPARISON FIX · 모든 특정 6개 조합의 1등 확률은 동일합니다.')
+        st.caption('MD LOTTO 6/45 · v8.3 EVIDENCE-GATED COVERAGE · 모든 특정 6개 조합의 1등 확률은 동일합니다.')

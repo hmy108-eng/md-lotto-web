@@ -46,7 +46,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from xml.sax.saxutils import escape as _xml_escape
 import pandas as pd
 import streamlit as st
-MD_BUILD_ID = 'MD-LOTTO-v9.0-HISTORICAL-LAB-20260921'
+MD_BUILD_ID = 'MD-LOTTO-v9.1-MOBILE-AUTO-SYNC-20260929'
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
@@ -951,18 +951,46 @@ if not path.exists():
     st.stop()
 df=load_csv(path)
 
-# v8.0 FINAL COMPLETE:
-# Never perform external network recovery before the first screen is rendered.
-# Streamlit Cloud can block/slow lottery endpoints and previously left the app
-# sitting indefinitely on the full-history spinner. Use bundled/cached history
-# immediately; the existing manual sync control performs recovery on demand.
+# v9.1 MOBILE AUTO-SYNC:
+# Boot from the cached/embedded history immediately, then perform a short,
+# non-blocking incremental check against the official endpoint. This fixes the
+# weekly lifecycle problem where the app stayed on the previous draw until the
+# user pressed the manual sync button.
+@st.cache_data(ttl=900,show_spinner=False)
+def mobile_startup_incremental_sync(_bucket):
+    with _SYNC_LOCK:
+        try:
+            d,inc=sync_incremental_official(path,max_new=3,timeout=4)
+            save_sqlite(d,db)
+            status={
+                'ok':True,
+                'using_cached_data':False,
+                'safe_boot':True,
+                'auto_sync':True,
+                'added_draws':inc.get('added_draws',[]),
+                'local_before':inc.get('local_before'),
+                'local_after':inc.get('local_after'),
+                'incremental_error':inc.get('incremental_error'),
+            }
+            save_sync_status(status,sp)
+            return status
+        except Exception as e:
+            status={'ok':False,'using_cached_data':path.exists(),'auto_sync':True,'error':str(e)}
+            save_sync_status(status,sp)
+            return status
+
 if not st.session_state.get('_safe_boot_v784'):
     st.session_state['_safe_boot_v784']=True
     st.session_state['startup_sync_status']={
-        'ok':True,'using_cached_data':True,'safe_boot':True,
-        'message':'1회부터 최신 1241회까지 검증된 전체이력을 내장했습니다. 온라인 동기화가 실패해도 전체 기능을 사용할 수 있습니다.'
+        'ok':True,'using_cached_data':True,'safe_boot':True,'auto_sync':True,
+        'message':'자동 최신회차 확인을 시작합니다.'
     }
     st.session_state['incremental_sync_status']={'ok':True,'safe_boot':True,'added_draws':[]}
+
+# Run at most once per 15 minutes per Streamlit session/cache bucket.
+_auto_sync=mobile_startup_incremental_sync(int(pd.Timestamp.now(tz='Asia/Seoul').timestamp())//900)
+st.session_state['incremental_sync_status']=_auto_sync
+st.session_state['startup_sync_status']=_auto_sync
 
 df=load_csv(path)
 status=dataset_status(df)

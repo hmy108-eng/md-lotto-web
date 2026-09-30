@@ -293,24 +293,17 @@ def recommendation_image_bytes(games,target_draw,basis_draw=None,draw_date=None)
     sub_font=_pick_font(30,True)
     row_font=_pick_font(34,True)
     num_font=_pick_font(54,True)
-
     d.rounded_rectangle((28,24,W-28,H-24),radius=34,outline=(213,170,69),width=4,fill=(4,18,39))
     d.rounded_rectangle((48,48,W-48,190),radius=26,outline=(155,124,52),width=2,fill=(7,27,55))
     d.text((78,78),f"MD LOTTO · 제 {int(target_draw)}회 최종 10조합",font=title_font,fill=(247,218,145))
     d.text((78,145),f"기준 {int(basis_draw) if basis_draw is not None else '-'}회 · {draw_date or ''}",font=sub_font,fill=(151,181,214))
-
-    y0=220
-    row_h=150
-    centers_x=[520,680,840,1000,1160,1320]
+    y0=220; row_h=150; centers_x=[520,680,840,1000,1160,1320]
     for i,g in enumerate(games,1):
         y=y0+(i-1)*row_h
         d.rounded_rectangle((58,y,W-58,y+132),radius=20,outline=(106,132,166),width=2,fill=(7,28,56))
         d.text((88,y+44),f"{i:02d}",font=row_font,fill=(235,196,91))
-        for cx,n in zip(centers_x,g):
-            _draw_signature_ball(d,cx,y+66,n,num_font)
-    out=BytesIO()
-    base.save(out,format='PNG',optimize=True)
-    return out.getvalue()
+        for cx,n in zip(centers_x,g): _draw_signature_ball(d,cx,y+66,n,num_font)
+    out=BytesIO(); base.save(out,format='PNG',optimize=True); return out.getvalue()
 
 def pct(v,d=2):
     try:return f'{float(v)*100:.{d}f}%'
@@ -988,7 +981,7 @@ with tabs[2]:
         else:
             st.info('「이번 회차 우선순위 10조합 만들기」를 누르세요.')
     with subt[1]:
-        _tb=five_ticket_threeplus_theoretical_bounds()
+        _tb=ten_game_threeplus_theoretical_bounds()
         st.info(f'목표: 10조합의 3개 이상 적중 커버리지를 가능한 한 높입니다. 하지만 10게임만으로는 수학적 한계가 있습니다. 단일 게임의 3개+ 확률은 약 {100*_tb["single_3plus"]:.2f}%이고, 10게임 전체의 3개+ 커버리지는 합집합 상한으로 최대 {100*_tb["max_10game_3plus_union_bound"]:.2f}%를 넘을 수 없습니다. 따라서 미당첨률 50% 이하는 10게임 조건에서는 불가능하며, 이론적 절대 하한도 약 {100*_tb["min_10game_miss_union_bound"]:.2f}%입니다.')
         if st.button('🧠 통합 최적화 시뮬레이션 실행',width='stretch',type='primary'):
             if _schedule_stale:

@@ -1,4 +1,4 @@
-# MD LOTTO v9.1.5 TRUE10 + DASHBOARD ACTIONS - FINAL
+# MD LOTTO v9.1.7 MOBILE SYNC FIX - 2026-10-11
 # GitHub update check: this exact version text must appear on line 1.
 import base64 as _b64, zlib as _zlib, json as _json, tempfile as _tempfile, sys as _sys
 from pathlib import Path as _Path
@@ -35,7 +35,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from xml.sax.saxutils import escape as _xml_escape
 import pandas as pd
 import streamlit as st
-MD_BUILD_ID = 'MD-LOTTO-v9.1.6-TRUE10-DASHBOARD-20260930'
+MD_BUILD_ID = 'MD-LOTTO-v9.1.7-SYNCFIX-20261011'
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
@@ -670,15 +670,21 @@ if _auto_sync_needed and not st.session_state.get('_auto_sync_attempt_date') == 
         _before_max=int(df.draw_no.max())
         _df_auto,_inc_auto=sync_incremental_official(path,max_new=6,timeout=5)
         _auto_sync_result=_inc_auto
-        if _inc_auto.get('ok') and _inc_auto.get('added_draws'):
+        if _inc_auto.get('added_draws'):
             save_sqlite(_df_auto,db)
             save_sync_status(_inc_auto,sp)
             st.session_state['startup_sync_status']=_inc_auto
+            st.session_state['incremental_sync_status']=_inc_auto
             for _k in ('md_games','md_recommendation_record','last_bt','corr_reg_diag','sim_optimizer_result','md_sim_final_games','integrated_correction_plan'):
                 st.session_state.pop(_k,None)
             df=_df_auto
+        elif not _inc_auto.get('ok'):
+            st.session_state['startup_sync_status']=_inc_auto
+            save_sync_status(_inc_auto,sp)
     except Exception as _auto_e:
         _auto_sync_result={'ok':False,'error':str(_auto_e),'using_cached_data':True,'auto_attempted':True}
+        st.session_state['startup_sync_status']=_auto_sync_result
+        save_sync_status(_auto_sync_result,sp)
 
 df=load_csv(path)
 status=dataset_status(df)
@@ -747,21 +753,85 @@ st.markdown(
       {balls_html(nums,bonus)}
     </div>''',unsafe_allow_html=True)
 
+_sync_notice=st.session_state.pop('manual_sync_notice',None)
+if _sync_notice:
+    _kind=_sync_notice.get('kind')
+    _message=_sync_notice.get('message','동기화 작업이 종료되었습니다.')
+    if _kind=='success':
+        st.success(_message)
+    elif _kind=='warning':
+        st.warning(_message)
+    else:
+        st.error(_message)
+
 def _manual_latest_update():
+    """Manual refresh: keep full-sync truth, persist both stores, and report outcome."""
+    _before=int(load_csv(path).draw_no.max()) if path.exists() else 0
     try:
         _df,_st=sync_history(path,verify_official_count=2)
-        save_sync_status(_st,sp)
-        _df,_inc=sync_incremental_official(path,max_new=6,timeout=8)
-        st.session_state['startup_sync_status']=_inc if _inc.get('ok') else _st
-        st.session_state['incremental_sync_status']=_inc
-        if _inc.get('ok') and _inc.get('added_draws'):
+        if _st.get('ok'):
+            # sync_history already atomically saves CSV; always refresh SQLite too.
             save_sqlite(_df,db)
+            save_sync_status(_st,sp)
+            st.session_state['startup_sync_status']=_st
+            st.session_state['incremental_sync_status']={'ok':True,'skipped':True,'reason':'full_history_sync_succeeded'}
+            _after=int(_df.draw_no.max()) if len(_df) else 0
+            if _after!=_before:
+                for _k in ('md_games','md_recommendation_record','last_bt','corr_reg_diag','sim_optimizer_result','md_sim_final_games','integrated_correction_plan'):
+                    st.session_state.pop(_k,None)
+            st.session_state['manual_sync_notice']={
+                'kind':'success',
+                'message':f'동기화 완료: 제{_after}회까지 전체 이력을 확인하고 CSV·SQLite 저장을 갱신했습니다.'
+            }
+            return _st
+
+        # If full archive sync failed, try incremental official data plus mirror fallback.
+        _df,_inc=sync_incremental_official(path,max_new=6,timeout=8)
+        _after=int(_df.draw_no.max()) if len(_df) else 0
+        if _inc.get('added_draws'):
+            save_sqlite(_df,db)
+            _partial={
+                **_inc,
+                'ok':True,
+                'complete':False,
+                'full_sync_error':_st.get('error'),
+                'latest_remote':_after,
+                'source':'incremental_fallback_after_full_sync_failure'
+            }
+            save_sync_status(_partial,sp)
+            st.session_state['startup_sync_status']=_partial
+            st.session_state['incremental_sync_status']=_partial
             for _k in ('md_games','md_recommendation_record','last_bt','corr_reg_diag','sim_optimizer_result','md_sim_final_games','integrated_correction_plan'):
                 st.session_state.pop(_k,None)
-        return _inc
+            st.session_state['manual_sync_notice']={
+                'kind':'warning',
+                'message':f'일부 갱신 완료: 제{_after}회까지 저장했습니다. 전체 이력 확인은 실패했습니다. {_st.get("error","")}'
+            }
+            return _partial
+
+        _err={
+            **_st,
+            'ok':False,
+            'error':_st.get('error') or _inc.get('incremental_error') or '새 회차 데이터를 확인하지 못했습니다.',
+            'incremental_error':_inc.get('incremental_error'),
+            'using_cached_data':True,
+            'latest_local':_after
+        }
+        save_sync_status(_err,sp)
+        st.session_state['startup_sync_status']=_err
+        st.session_state['incremental_sync_status']=_inc
+        st.session_state['manual_sync_notice']={
+            'kind':'error',
+            'message':f'동기화 실패: 저장된 데이터는 유지했습니다(현재 제{_after}회). 원인: {_err["error"]}'
+        }
+        return _err
     except Exception as _e:
         _err={'ok':False,'error':str(_e),'using_cached_data':True}
         st.session_state['startup_sync_status']=_err
+        st.session_state['manual_sync_notice']={
+            'kind':'error',
+            'message':f'동기화 중 오류가 발생했습니다. 기존 데이터는 유지했습니다. 원인: {str(_e)}'
+        }
         return _err
 
 with st.sidebar:

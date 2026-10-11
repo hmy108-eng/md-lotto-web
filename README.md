@@ -1,4 +1,8 @@
-# MD LOTTO 6/45 v3.0 FINAL
+# MD LOTTO 6/45 v9.1.7 Mobile Sync Fix
+
+> **2026-10-11 update:** mobile manual refresh now reports success/failure visibly, updates CSV and SQLite together, and incremental sync falls back to the public archive if the official endpoint fails. Bundled draw history is updated through draw 1245. Source changes are deployed to the repository's `main` branch; a live Streamlit mobile session has not been runtime-tested from this environment.
+
+
 
 개인용 확률·통계·조합설계 연구 도구입니다. **당첨번호 예언 프로그램이 아닙니다.** 공정한 6/45에서 모든 특정 6개 조합의 1등 확률은 동일합니다.
 

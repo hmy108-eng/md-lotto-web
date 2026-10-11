@@ -316,8 +316,24 @@ def sync_incremental_official(path:str|Path, max_new:int=3, timeout:int=5)->tupl
     added=[]
     error=None
     mirror_cache=None
+    # Determine the latest published draw first so the app does not treat an
+    # expected not-yet-drawn next round as a failed synchronization.
+    known_latest=discover_official_latest(timeout=timeout)
+    if known_latest is None:
+        try:
+            known_latest=int(fetch_mirror_latest(timeout=timeout)['draw_no'])
+        except Exception:
+            known_latest=None
+    if known_latest is not None and before>=known_latest:
+        return df,{
+            'ok':True,'complete':True,'local_before':before,'local_after':before,
+            'known_latest':known_latest,'added_draws':[],'incremental_error':None,
+            'using_cached_data':True,'source':'already_current'
+        }
     for _ in range(max_new):
         nxt=int(df.draw_no.max())+1 if len(df) else 1
+        if known_latest is not None and nxt>known_latest:
+            break
         try:
             try:
                 row=fetch_official_draw(nxt,timeout=timeout)

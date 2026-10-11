@@ -662,7 +662,9 @@ df=load_csv(path)
 _kst_now=pd.Timestamp.now(tz='Asia/Seoul').tz_localize(None)
 _today_kst=_kst_now.normalize()
 _latest_draw_date_boot=pd.Timestamp(df.iloc[-1].draw_date).normalize()
-_auto_sync_needed=bool(_today_kst > _latest_draw_date_boot)
+# Only attempt automatic sync after the next weekly draw date has passed.
+# The day after a Saturday draw is not a missing-result error.
+_auto_sync_needed=bool(_today_kst > (_latest_draw_date_boot + pd.DateOffset(days=7)))
 _auto_sync_result=None
 if _auto_sync_needed and not st.session_state.get('_auto_sync_attempt_date') == str(_today_kst.date()):
     st.session_state['_auto_sync_attempt_date']=str(_today_kst.date())

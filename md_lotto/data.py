@@ -309,23 +309,32 @@ def add_derived_features(df:pd.DataFrame)->pd.DataFrame:
 
 
 def sync_incremental_official(path:str|Path, max_new:int=3, timeout:int=5)->tuple[pd.DataFrame,dict]:
-    """Best-effort incremental update from the official endpoint.
-
-    Checks local_max+1, then continues while valid new draws exist.
-    Any network/unavailable-next-draw condition is non-fatal.
-    """
+    """Incremental sync with a single bulk-mirror fallback and truthful status."""
     p=Path(path)
     df=load_csv(p)
     before=int(df.draw_no.max()) if len(df) else 0
     added=[]
     error=None
+    mirror_cache=None
     for _ in range(max_new):
         nxt=int(df.draw_no.max())+1 if len(df) else 1
         try:
-            row=fetch_official_draw(nxt,timeout=timeout)
+            try:
+                row=fetch_official_draw(nxt,timeout=timeout)
+            except Exception as official_error:
+                # The official endpoint can reject cloud requests. Fetch the
+                # public archive once and reuse it for all missing draws.
+                if mirror_cache is None:
+                    mirror_cache=fetch_mirror_all(timeout=max(20,timeout))
+                hit=mirror_cache[mirror_cache.draw_no.astype(int)==nxt]
+                if hit.empty:
+                    raise RuntimeError(
+                        f'공식 API 실패({official_error}); 보조 이력에서 제{nxt}회 결과를 찾지 못했습니다.'
+                    )
+                row=hit.iloc[0].to_dict()
             one=validate(pd.DataFrame([row]))
             if int(one.iloc[0].draw_no)!=nxt:
-                break
+                raise ValueError(f'요청한 제{nxt}회와 응답 회차가 일치하지 않습니다.')
             df=pd.concat([df,one],ignore_index=True)
             df=validate(df)
             added.append(nxt)
@@ -334,7 +343,14 @@ def sync_incremental_official(path:str|Path, max_new:int=3, timeout:int=5)->tupl
             break
     if added:
         save_csv(df,p)
+    latest=int(df.draw_no.max()) if len(df) else 0
     return df,{
-        'ok':True,'local_before':before,'local_after':int(df.draw_no.max()) if len(df) else 0,
-        'added_draws':added,'incremental_error':error
+        'ok': error is None,
+        'complete': error is None,
+        'local_before':before,
+        'local_after':latest,
+        'added_draws':added,
+        'incremental_error':error,
+        'using_cached_data':not bool(added),
+        'source':'official_with_single_mirror_fallback' if mirror_cache is not None else 'official'
     }
